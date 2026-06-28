@@ -72,7 +72,8 @@
         async function loadGames() {
             try {
                 // ИСПРАВЛЕНО: Меняем http на https и указываем ПРАВИЛЬНЫЙ эндпоинт для списка игр
-                const response = await fetch('https://singer-dolly-mooned.ngrok-free.app/api/games');
+                // Замени на имя, которое ты вписал в CHOSEN_SUBDOMAIN:
+                const response = await fetch('https://egor-achievements-tracker-cool.loca.lt/api/games');
                 const data = await response.json();
 
                 // Проверяем, не вернул ли сервер ошибку

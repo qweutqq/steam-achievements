@@ -72,7 +72,7 @@
         async function loadGames() {
             try {
                 // ИСПРАВЛЕНО: Меняем http на https и указываем ПРАВИЛЬНЫЙ эндпоинт для списка игр
-                const response = await fetch('https://singer-dolly-mooned.ngrok-free.dev/api/games');
+                const response = await fetch('https://singer-dolly-mooned.ngrok-free.app/api/games');
                 const data = await response.json();
 
                 // Проверяем, не вернул ли сервер ошибку

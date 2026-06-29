@@ -6,73 +6,84 @@
     <title>Steam Achievement Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* БАЗОВЫЙ СКВОЗНОЙ СТИЛЬ */
         body {
             background-color: #000000;
             color: #c9d1d9;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            min-height: 100vh;
             -webkit-font-smoothing: antialiased;
         }
 
+        /* ДИНАМИЧЕСКИЙ ГЛОБАЛЬНЫЙ ФОН */
+        .global-bg {
+            position: fixed;
+            top: -20px;
+            left: -20px;
+            width: calc(100% + 40px);
+            height: calc(100vh + 40px);
+            z-index: 1;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(25px); /* Мощный красивый блюр */
+            opacity: 0.45; /* Прозрачность, чтобы не слепило */
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        /* Общая обертка для контента, которая скроллится поверх фиксированного фона */
         .content-wrapper {
-            padding: 15px;
             position: relative;
             z-index: 2;
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         /* --- ГЛАВНОЕ МЕНЮ --- */
         .main-header {
             text-align: center;
-            margin: 25px 0 25px;
+            margin: 25px 0;
         }
         .main-title {
             display: inline-flex;
             align-items: center;
             gap: 10px;
             color: #58a6ff;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin: 0;
-        }
-        .main-title i {
-            font-size: 20px;
         }
 
+        /* СПИСОК ИГР (БЕЗ ЧЕРНЫХ ПРЯМОУГОЛЬНИКОВ) */
         .games-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            max-width: 600px;
-            margin: 0 auto;
+            gap: 4px;
         }
         .game-row {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 8px 12px;
+            background: transparent; /* Убрали черный плашечный фон */
+            border-bottom: 1px solid rgba(48, 54, 61, 0.4); /* Только тонкая разделительная линия */
+            padding: 12px 6px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             cursor: pointer;
-            transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
+            transition: background-color 0.2s, padding-left 0.2s;
         }
         .game-row:hover {
-            background-color: #1f242c;
-            border-color: #58a6ff;
-        }
-        .game-row:active {
-            transform: scale(0.98);
+            background-color: rgba(88, 166, 255, 0.05);
+            padding-left: 10px;
         }
         .game-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 6px;
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
             object-fit: cover;
-            background-color: #21262d;
+            background-color: rgba(33, 38, 45, 0.5);
             flex-shrink: 0;
         }
         .game-info {
@@ -82,70 +93,28 @@
             flex-grow: 1;
         }
         .game-name {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: #f0f6fc;
         }
         .perfect-badge {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
             font-size: 11px;
-            background-color: rgba(212, 175, 55, 0.12);
-            color: #d4af37;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            padding: 3px 8px;
-            border-radius: 10px;
+            color: #ffd700;
             font-weight: 700;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
         }
 
-        /* --- ЭКРАН АЧИВОК С БЛЮРОМ И ГРАДИЕНТОМ --- */
-        #achievements-view {
-            position: relative;
-            min-height: 100vh;
-        }
-
-        .game-background-fixed {
-            position: fixed;
-            top: -10px; /* Чуть компенсируем блюр по краям */
-            left: -10px;
-            width: calc(100% + 20px);
-            height: 55vh;
-            z-index: 1;
-            background-size: cover;
-            background-position: center top;
-            background-repeat: no-repeat;
-            /* Добавляем красивый блюр */
-            filter: blur(8px);
-            opacity: 0.7;
-        }
-        /* ТЕМНАЯ ПОДЛОЖКА ПОВЕРХ БЛЮРА ДЛЯ ЧИТАЕМОСТИ */
-        .game-background-fixed::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.55);
-        }
-        /* ПЛАВНЫЙ ГРАДИЕНТ В ЧЕРНЫЙ ФОН */
-        .game-background-fixed::after {
-            content: "";
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 60%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
-        }
-
+        /* --- ЭКРАН АЧИВОК --- */
         .back-btn {
-            background-color: rgba(33, 38, 45, 0.6);
-            backdrop-filter: blur(5px);
+            background-color: rgba(33, 38, 45, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: #58a6ff;
-            border: 1px solid #30363d;
-            padding: 7px 14px;
+            border: 1px solid rgba(48, 54, 61, 0.6);
+            padding: 8px 14px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
@@ -153,20 +122,12 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            position: relative;
-            z-index: 3;
             font-size: 13px;
         }
-        .back-btn:hover {
-            background-color: rgba(48, 54, 61, 0.7);
-        }
 
-        .game-header-on-bg {
+        .game-header-inside {
             text-align: center;
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 3;
-            padding-top: 6vh;
+            margin: 10px 0 25px;
         }
         .game-title-text {
             display: inline-flex;
@@ -174,40 +135,23 @@
             justify-content: center;
             gap: 10px;
             color: #f0f6fc;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-            margin: 0 auto;
-            max-width: 90%;
         }
         .perfect-crown-icon {
             color: #ffd700;
-            font-size: 20px;
-            animation: pulse 2s infinite alternate;
+            font-size: 22px;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.1); }
-        }
-
-        /* КОНТЕЙНЕР АЧИВОК */
-        .achievements-container {
-            max-width: 600px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 3;
-            background-color: #000000;
-            padding-top: 5px;
-        }
-
-        /* ПРОГРЕСС-БАР */
+        /* ПРОГРЕСС-БАР (ЧИСТЫЙ СТИЛЬ) */
         .progress-container {
-            background-color: #161b22;
-            border: 1px solid #30363d;
+            background-color: rgba(22, 27, 34, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(48, 54, 61, 0.5);
             border-radius: 8px;
             padding: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 18px;
         }
         .progress-text {
             display: flex;
@@ -215,10 +159,9 @@
             font-size: 12px;
             font-weight: 600;
             margin-bottom: 6px;
-            color: #f0f6fc;
         }
         .progress-bar-bg {
-            background-color: #21262d;
+            background-color: rgba(33, 38, 45, 0.7);
             border-radius: 4px;
             height: 6px;
             width: 100%;
@@ -228,47 +171,47 @@
             background: linear-gradient(90deg, #58a6ff, #1f6feb);
             height: 100%;
             width: 0%;
-            transition: width 0.35s ease-out;
+            transition: width 0.4s ease-out;
         }
         .progress-container.perfect-game .progress-bar-fill {
             background: linear-gradient(90deg, #ffd700, #d4af37) !important;
         }
         .progress-container.perfect-game {
-            border-color: rgba(212, 175, 55, 0.35) !important;
-            background-color: rgba(212, 175, 55, 0.02) !important;
+            border-color: rgba(212, 175, 55, 0.4) !important;
         }
 
-        /* СПИСОК АЧИВОК */
+        /* СПИСОК АЧИВОК (БЕЗ ЧЕРНОГО ЗАДНИКА) */
         .achievements-list {
             display: flex;
             flex-direction: column;
-            gap: 7px;
+            gap: 6px;
         }
         .achievement-item {
-            background-color: #161b22;
-            border: 1px solid #30363d;
+            background-color: rgba(22, 27, 34, 0.35); /* Прозрачный темный налет, чтобы читался текст */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(48, 54, 61, 0.3);
             border-radius: 8px;
-            padding: 9px;
+            padding: 10px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         .achievement-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 4px;
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
             object-fit: cover;
-            background-color: #21262d;
-            border: 1px solid #30363d;
+            border: 1px solid rgba(48, 54, 61, 0.5);
             flex-shrink: 0;
         }
         .icon-locked {
-            filter: grayscale(100%) opacity(40%);
+            filter: grayscale(100%) opacity(35%);
         }
         .achievement-info {
             display: flex;
             flex-direction: column;
-            gap: 1px;
+            gap: 2px;
             flex-grow: 1;
         }
         .achievement-name {
@@ -281,27 +224,24 @@
             color: #8b949e;
         }
 
-        /* БЭЙДЖИ СТАТУСА */
         .status-badge {
             display: flex;
             align-items: center;
             gap: 5px;
-            font-size: 11px;
-            padding: 3px 6px;
+            font-size: 10px;
+            padding: 4px 7px;
             border-radius: 6px;
             font-weight: 700;
-            white-space: nowrap;
         }
         .status-unlocked {
             background-color: rgba(56, 139, 253, 0.1);
             color: #58a6ff;
-            border: 1px solid rgba(56, 139, 253, 0.25);
+            border: 1px solid rgba(56, 139, 253, 0.2);
         }
         .status-locked {
             background-color: rgba(240, 246, 252, 0.02);
             color: #8b949e;
-            border: 1px solid #30363d;
-            padding: 4px 8px;
+            border: 1px solid rgba(48, 54, 61, 0.4);
         }
 
         .hidden { display: none !important; }
@@ -309,12 +249,13 @@
 </head>
 <body>
 
+    <div id="global-dynamic-bg" class="global-bg"></div>
+
     <div id="games-view">
         <div class="content-wrapper">
             <header class="main-header">
                 <div class="main-title">
-                    <i class="fa-brands fa-steam"></i>
-                    Steam
+                    <i class="fa-brands fa-steam"></i> Steam
                 </div>
             </header>
             <div class="games-list" id="games-container">Загрузка списка игр...</div>
@@ -322,35 +263,36 @@
     </div>
 
     <div id="achievements-view" class="hidden">
-        <div id="game-bg-image" class="game-background-fixed"></div>
-
         <div class="content-wrapper">
             <button class="back-btn" onclick="showGamesView()">
                 <i class="fa-solid fa-arrow-left"></i> К списку игр
             </button>
 
-            <header class="game-header-on-bg">
+            <header class="game-header-inside">
                 <div id="selected-game-title" class="game-title-text">Ачивки</div>
             </header>
 
-            <div class="achievements-container">
-                <div id="progress-block" class="progress-container">
-                    <div class="progress-text">
-                        <span id="progress-stats">Выполнено: 0 из 0</span>
-                        <span id="progress-percent">0%</span>
-                    </div>
-                    <div class="progress-bar-bg">
-                        <div id="progress-bar-fill" class="progress-bar-fill"></div>
-                    </div>
+            <div id="progress-block" class="progress-container">
+                <div class="progress-text">
+                    <span id="progress-stats">Выполнено: 0 из 0</span>
+                    <span id="progress-percent">0%</span>
                 </div>
-
-                <div class="achievements-list" id="achievements-container">Загрузка достижений...</div>
+                <div class="progress-bar-bg">
+                    <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                </div>
             </div>
+
+            <div class="achievements-list" id="achievements-container">Загрузка достижений...</div>
         </div>
     </div>
 
     <script>
         const BACKEND_URL = 'https://steam-achievements-backend.onrender.com';
+        // Дефолтный красивый фон для главного меню (логотип Steam или темный абстракт)
+        const DEFAULT_BG = "https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=1000&auto=format&fit=crop";
+
+        // Ставим дефолтный фон при старте
+        document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
 
         async function loadGames() {
             try {
@@ -361,16 +303,15 @@
                 const container = document.getElementById('games-container');
                 container.innerHTML = '';
 
-                for (const game of data.games) {
+                data.games.forEach(game => {
                     const row = document.createElement('div');
                     row.className = 'game-row';
-                    row.id = `game-row-${game.appid}`;
                     row.onclick = () => loadAchievements(game.appid, game.name);
 
                     const imgUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/header.jpg`;
 
                     row.innerHTML = `
-                        <img class="game-avatar" src="${imgUrl}" alt="${game.name}" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=38&h=38&auto=format&fit=crop'">
+                        <img class="game-avatar" src="${imgUrl}" alt="${game.name}" onerror="this.src='${DEFAULT_BG}'">
                         <div class="game-info">
                             <div class="game-name">${game.name}</div>
                             <div class="perfect-badge hidden" id="badge-${game.appid}">
@@ -381,10 +322,10 @@
                     container.appendChild(row);
 
                     checkGamePerfectStatus(game.appid);
-                }
+                });
             } catch (error) {
                 console.error("Ошибка загрузки игр:", error);
-                document.getElementById('games-container').innerHTML = '<p style="color:red; text-align:center; font-size:14px; margin-top:20px;">Не удалось загрузить библиотеку</p>';
+                document.getElementById('games-container').innerHTML = '<p style="color:red; text-align:center; font-size:13px; margin-top:20px;">Не удалось загрузить библиотеку</p>';
             }
         }
 
@@ -401,7 +342,7 @@
                         if (badge) badge.classList.remove('hidden');
                     }
                 }
-            } catch(e) { console.error("Ошибка проверки:", gameId, e); }
+            } catch(e) { console.error(e); }
         }
 
         async function loadAchievements(gameId, gameName) {
@@ -411,18 +352,16 @@
             const titleElement = document.getElementById('selected-game-title');
             titleElement.innerText = gameName;
 
-            const bgElement = document.getElementById('game-bg-image');
+            // Мягко меняем глобальный размытый фон под выбранную игру
             const imgUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${gameId}/header.jpg`;
-            bgElement.style.backgroundImage = `url('${imgUrl}')`;
+            document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${imgUrl}')`;
 
             const container = document.getElementById('achievements-container');
-            container.innerHTML = '<p style="color:#8b949e; text-align:center; font-size:13px; margin-top:10px;">Загрузка достижений...</p>';
+            container.innerHTML = '<p style="color:#8b949e; text-align:center; font-size:13px;">Загрузка достижений...</p>';
 
             const progressBlock = document.getElementById('progress-block');
             progressBlock.classList.remove('perfect-game');
             document.getElementById('progress-bar-fill').style.width = '0%';
-            document.getElementById('progress-stats').innerText = 'Выполнено: 0 из 0';
-            document.getElementById('progress-percent').innerText = '0%';
 
             try {
                 const response = await fetch(`${BACKEND_URL}/api/achievements?game_id=${gameId}`);
@@ -435,8 +374,11 @@
 
                 container.innerHTML = '';
 
-                const total = data.achievements.length;
-                const unlocked = data.achievements.filter(ach => ach.achieved === 1).length;
+                // СОРТИРОВКА: Сначала НЕПОЛУЧЕННЫЕ (achieved === 0), потом ПОЛУЧЕННЫЕ (achieved === 1)
+                const sortedAchievements = data.achievements.sort((a, b) => a.achieved - b.achieved);
+
+                const total = sortedAchievements.length;
+                const unlocked = sortedAchievements.filter(ach => ach.achieved === 1).length;
                 const percent = Math.round((unlocked / total) * 100);
 
                 document.getElementById('progress-stats').innerText = `Выполнено: ${unlocked} из ${total}`;
@@ -445,17 +387,15 @@
 
                 if (percent === 100) {
                     progressBlock.classList.add('perfect-game');
-                    // Добавляем золотую корону FontAwesome к названию игры
                     titleElement.innerHTML = `<i class="fa-solid fa-crown perfect-crown-icon"></i> ${gameName}`;
                 }
 
-                data.achievements.forEach(ach => {
+                sortedAchievements.forEach(ach => {
                     const item = document.createElement('div');
                     item.className = 'achievement-item';
 
                     const isUnlocked = ach.achieved === 1;
                     const badgeClass = isUnlocked ? 'status-unlocked' : 'status-locked';
-                    // Векторные иконки кубка и замка
                     const badgeText = isUnlocked ? `<i class="fa-solid fa-trophy"></i> Открыто` : `<i class="fa-solid fa-lock"></i>`;
                     const iconClass = isUnlocked ? 'achievement-icon' : 'achievement-icon icon-locked';
                     const descText = ach.description ? ach.description : 'Секретное достижение';
@@ -463,7 +403,7 @@
                     const iconUrl = ach.icon_url ? ach.icon_url : 'https://community.cloudflare.steamstatic.com/public/images/apps/570/6ee3ec3bc938be94f489f00d8329606d860d70eb.jpg';
 
                     item.innerHTML = `
-                        <img class="${iconClass}" src="${iconUrl}" alt="icon" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=38&h=38&auto=format&fit=crop'">
+                        <img class="${iconClass}" src="${iconUrl}" alt="icon" onerror="this.src='${DEFAULT_BG}'">
                         <div class="achievement-info">
                             <div class="achievement-name">${ach.name}</div>
                             <div class="achievement-desc">${descText}</div>
@@ -474,14 +414,16 @@
                 });
 
             } catch (error) {
-                console.error("Ошибка загрузки ачивок:", error);
-                container.innerHTML = '<p style="color:red; text-align:center; font-size:13px; margin-top:10px;">Не удалось загрузить ачивки</p>';
+                console.error(error);
+                container.innerHTML = '<p style="color:red; text-align:center; font-size:13px;">Не удалось загрузить ачивки</p>';
             }
         }
 
         function showGamesView() {
             document.getElementById('achievements-view').classList.add('hidden');
             document.getElementById('games-view').classList.remove('hidden');
+            // При возврате ставим дефолтный фон обратно
+            document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
         }
 
         loadGames();

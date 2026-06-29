@@ -13,7 +13,6 @@
             padding: 15px;
         }
 
-        /* ОБЩИЙ ЗАГОЛОВОК */
         h1 {
             text-align: center;
             color: #58a6ff;
@@ -54,8 +53,8 @@
         }
         .game-info {
             display: flex;
-            flex-direction: column;
-            gap: 2px;
+            align-items: center;
+            justify-content: space-between;
             flex-grow: 1;
         }
         .game-name {
@@ -63,9 +62,14 @@
             font-weight: 600;
             color: #f0f6fc;
         }
-        .game-hint {
-            font-size: 12px;
-            color: #8b949e;
+        .perfect-badge {
+            font-size: 13px;
+            background-color: rgba(212, 175, 55, 0.15);
+            color: #d4af37;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: bold;
         }
 
         /* СТИЛИ ЭКРАНА АЧИВОК */
@@ -119,6 +123,14 @@
             height: 100%;
             width: 0%;
             transition: width 0.4s ease-out;
+        }
+        /* Золотой прогресс-бар для 100% */
+        .progress-container.perfect-game .progress-bar-fill {
+            background: linear-gradient(90deg, #ffd700, #d4af37) !important;
+        }
+        .progress-container.perfect-game {
+            border-color: rgba(212, 175, 55, 0.5) !important;
+            background-color: rgba(212, 175, 55, 0.03) !important;
         }
 
         /* СПИСОК АЧИВОК */
@@ -194,7 +206,7 @@
         <h1 id="selected-game-title">Ачивки</h1>
 
         <div class="achievements-container">
-            <div class="progress-container">
+            <div id="progress-block" class="progress-container">
                 <div class="progress-text">
                     <span id="progress-stats">Выполнено: 0 из 0</span>
                     <span id="progress-percent">0%</span>
@@ -211,6 +223,9 @@
     <script>
         const BACKEND_URL = 'https://steam-achievements-backend.onrender.com';
 
+        // Хранилище для предзагруженных данных о прогрессе игр
+        let gamesProgressCache = {};
+
         async function loadGames() {
             try {
                 const response = await fetch(`${BACKEND_URL}/api/games`);
@@ -220,26 +235,53 @@
                 const container = document.getElementById('games-container');
                 container.innerHTML = '';
 
-                data.games.forEach(game => {
+                // Сначала создаем базовый список игр
+                for (const game of data.games) {
                     const row = document.createElement('div');
                     row.className = 'game-row';
+                    row.id = `game-row-${game.appid}`;
                     row.onclick = () => loadAchievements(game.appid, game.name);
 
-                    // Для маленьких иконок в списке идеально подходит стандартный header или капсула игры
                     const imgUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/header.jpg`;
 
                     row.innerHTML = `
                         <img class="game-avatar" src="${imgUrl}" alt="${game.name}" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=42&h=42&auto=format&fit=crop'">
                         <div class="game-info">
                             <div class="game-name">${game.name}</div>
-                            <div class="game-hint">Нажми, чтобы посмотреть ачивки</div>
+                            <div class="perfect-badge hidden" id="badge-${game.appid}">🏅 100%</div>
                         </div>
                     `;
                     container.appendChild(row);
-                });
+
+                    // Фоном запрашиваем прогресс для каждой игры, чтобы узнать, пройдена ли она на 100%
+                    checkGamePerfectStatus(game.appid);
+                }
             } catch (error) {
                 console.error("Ошибка загрузки игр:", error);
                 document.getElementById('games-container').innerHTML = '<p style="color:red; text-align:center;">Не удалось загрузить библиотеку</p>';
+            }
+        }
+
+        // Фоновая функция для проверки 100% прохождения игры
+        async function checkGamePerfectStatus(gameId) {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/achievements?game_id=${gameId}`);
+                const data = await response.json();
+                if (data.achievements && data.achievements.length > 0) {
+                    const total = data.achievements.length;
+                    const unlocked = data.achievements.filter(ach => ach.achieved === 1).length;
+
+                    // Сохраняем в кэш
+                    gamesProgressCache[gameId] = { total, unlocked };
+
+                    if (total === unlocked && total > 0) {
+                        // Если выбито 100%, показываем золотую медаль в списке игр
+                        const badge = document.getElementById(`badge-${gameId}`);
+                        if (badge) badge.classList.remove('hidden');
+                    }
+                }
+            } catch(e) {
+                console.error("Ошибка проверки статуса игры:", gameId, e);
             }
         }
 
@@ -251,6 +293,8 @@
             const container = document.getElementById('achievements-container');
             container.innerHTML = 'Загрузка достижений...';
 
+            const progressBlock = document.getElementById('progress-block');
+            progressBlock.classList.remove('perfect-game');
             document.getElementById('progress-bar-fill').style.width = '0%';
             document.getElementById('progress-stats').innerText = 'Выполнено: 0 из 0';
             document.getElementById('progress-percent').innerText = '0%';
@@ -273,6 +317,12 @@
                 document.getElementById('progress-stats').innerText = `Выполнено: ${unlocked} из ${total}`;
                 document.getElementById('progress-percent').innerText = `${percent}%`;
                 document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+
+                // Если игра пройдена на 100%, красим прогресс-бар в золотой цвет
+                if (percent === 100) {
+                    progressBlock.classList.add('perfect-game');
+                    document.getElementById('selected-game-title').innerHTML = `👑 ${gameName} 👑`;
+                }
 
                 data.achievements.forEach(ach => {
                     const item = document.createElement('div');

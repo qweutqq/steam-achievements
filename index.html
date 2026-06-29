@@ -10,57 +10,65 @@
             color: #c9d1d9;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
         }
+
+        /* ОБЩИЙ ЗАГОЛОВОК */
         h1 {
             text-align: center;
             color: #58a6ff;
-            font-size: 24px;
+            font-size: 22px;
             margin-bottom: 20px;
         }
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
-            max-width: 800px;
+
+        /* ИНТЕРФЕЙС СПИСКА ИГР */
+        .games-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 600px;
             margin: 0 auto;
         }
-        .game-card {
+        .game-row {
             background-color: #161b22;
             border: 1px solid #30363d;
             border-radius: 8px;
-            overflow: hidden;
+            padding: 10px 12px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 10px;
-            text-align: center;
-            transition: transform 0.2s;
+            gap: 12px;
             cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
         }
-        .game-card:hover {
-            transform: scale(1.03);
+        .game-row:hover {
+            background-color: #1f242c;
             border-color: #58a6ff;
         }
-        .game-cover {
-            width: 120px;
-            height: 160px;
+        .game-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 6px;
             object-fit: cover;
-            border-radius: 4px;
             background-color: #21262d;
-            margin-bottom: 8px;
+            flex-shrink: 0;
         }
-        .game-title {
-            font-size: 14px;
+        .game-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex-grow: 1;
+        }
+        .game-name {
+            font-size: 15px;
             font-weight: 600;
             color: #f0f6fc;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            height: 40px;
+        }
+        .game-hint {
+            font-size: 12px;
+            color: #8b949e;
         }
 
+        /* СТИЛИ ЭКРАНА АЧИВОК */
         .hidden {
             display: none !important;
         }
@@ -72,7 +80,7 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: inline-block;
         }
         .back-btn:hover {
@@ -88,21 +96,21 @@
             background-color: #161b22;
             border: 1px solid #30363d;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 12px;
+            margin-bottom: 15px;
         }
         .progress-text {
             display: flex;
             justify-content: space-between;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #f0f6fc;
         }
         .progress-bar-bg {
             background-color: #21262d;
-            border-radius: 6px;
-            height: 12px;
+            border-radius: 4px;
+            height: 8px;
             width: 100%;
             overflow: hidden;
         }
@@ -110,67 +118,65 @@
             background: linear-gradient(90deg, #58a6ff, #1f6feb);
             height: 100%;
             width: 0%;
-            transition: width 0.5s ease-out;
+            transition: width 0.4s ease-out;
         }
 
+        /* СПИСОК АЧИВОК */
         .achievements-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         .achievement-item {
             background-color: #161b22;
             border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 10px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
-
-        /* ИКОНКИ АЧИВОК */
         .achievement-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 4px;
             object-fit: cover;
             background-color: #21262d;
             border: 1px solid #30363d;
             flex-shrink: 0;
         }
-        /* Серые иконки для закрытых ачивок */
         .icon-locked {
-            filter: grayscale(100%) opacity(60%);
+            filter: grayscale(100%) opacity(50%);
         }
-
         .achievement-info {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
             flex-grow: 1;
         }
         .achievement-name {
+            font-size: 14px;
             font-weight: bold;
             color: #f0f6fc;
         }
         .achievement-desc {
-            font-size: 13px;
+            font-size: 12px;
             color: #8b949e;
         }
         .status-badge {
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 12px;
+            font-size: 11px;
+            padding: 3px 6px;
+            border-radius: 8px;
             font-weight: bold;
             white-space: nowrap;
         }
         .status-unlocked {
-            background-color: rgba(56, 139, 253, 0.15);
+            background-color: rgba(56, 139, 253, 0.12);
             color: #58a6ff;
-            border: 1px solid rgba(56, 139, 253, 0.4);
+            border: 1px solid rgba(56, 139, 253, 0.3);
         }
         .status-locked {
-            background-color: rgba(240, 246, 252, 0.05);
+            background-color: rgba(240, 246, 252, 0.03);
             color: #8b949e;
             border: 1px solid #30363d;
         }
@@ -179,8 +185,8 @@
 <body>
 
     <div id="games-view">
-        <h1>🎮 Моя библиотека Steam</h1>
-        <div class="games-grid" id="games-container">Загрузка игр...</div>
+        <h1>🎮 Библиотека Steam</h1>
+        <div class="games-list" id="games-container">Загрузка списка игр...</div>
     </div>
 
     <div id="achievements-view" class="hidden">
@@ -215,32 +221,25 @@
                 container.innerHTML = '';
 
                 data.games.forEach(game => {
-                    const card = document.createElement('div');
-                    card.className = 'game-card';
-                    card.onclick = () => loadAchievements(game.appid, game.name);
+                    const row = document.createElement('div');
+                    row.className = 'game-row';
+                    row.onclick = () => loadAchievements(game.appid, game.name);
 
-                    // Формируем официальную ссылку на вертикальную обложку игры в Steam
-                    const coverUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/library_600x900.jpg`;
-                    // ЗАПАСНОЙ ВАРИАНТ: Горизонтальный баннер (если вертикального нет)
-                    const fallbackUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/header.jpg`;
+                    // Для маленьких иконок в списке идеально подходит стандартный header или капсула игры
+                    const imgUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/header.jpg`;
 
-                    card.innerHTML = `
-                        <img class="game-cover"
-                             src="${coverUrl}"
-                             alt="${game.name}"
-                             onerror="if (this.src != '${fallbackUrl}') { this.src = '${fallbackUrl}'; } else { this.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=240&h=320&auto=format&fit=crop'; }">
-                        <div class="game-title">${game.name}</div>
+                    row.innerHTML = `
+                        <img class="game-avatar" src="${imgUrl}" alt="${game.name}" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=42&h=42&auto=format&fit=crop'">
+                        <div class="game-info">
+                            <div class="game-name">${game.name}</div>
+                            <div class="game-hint">Нажми, чтобы посмотреть ачивки</div>
+                        </div>
                     `;
-
-                    card.innerHTML = `
-                        <img class="game-cover" src="${coverUrl}" alt="${game.name}" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=240&h=320&auto=format&fit=crop'">
-                        <div class="game-title">${game.name}</div>
-                    `;
-                    container.appendChild(card);
+                    container.appendChild(row);
                 });
             } catch (error) {
                 console.error("Ошибка загрузки игр:", error);
-                document.getElementById('games-container').innerHTML = '<p style="color:red; text-align:center;">Не удалось подключиться к серверу</p>';
+                document.getElementById('games-container').innerHTML = '<p style="color:red; text-align:center;">Не удалось загрузить библиотеку</p>';
             }
         }
 
@@ -252,7 +251,6 @@
             const container = document.getElementById('achievements-container');
             container.innerHTML = 'Загрузка достижений...';
 
-            // Сбрасываем прогресс-бар в 0 перед загрузкой
             document.getElementById('progress-bar-fill').style.width = '0%';
             document.getElementById('progress-stats').innerText = 'Выполнено: 0 из 0';
             document.getElementById('progress-percent').innerText = '0%';
@@ -262,18 +260,16 @@
                 const data = await response.json();
 
                 if (data.error || !data.achievements || data.achievements.length === 0) {
-                    container.innerHTML = `<p style="color:#8b949e; text-align:center;">${data.error || "У этой игры нет достижений."}</p>`;
+                    container.innerHTML = `<p style="color:#8b949e; text-align:center;">У этой игры нет достижений.</p>`;
                     return;
                 }
 
                 container.innerHTML = '';
 
-                // Считаем прогресс
                 const total = data.achievements.length;
                 const unlocked = data.achievements.filter(ach => ach.achieved === 1).length;
                 const percent = Math.round((unlocked / total) * 100);
 
-                // Обновляем прогресс-бар на экране
                 document.getElementById('progress-stats').innerText = `Выполнено: ${unlocked} из ${total}`;
                 document.getElementById('progress-percent').innerText = `${percent}%`;
                 document.getElementById('progress-bar-fill').style.width = `${percent}%`;
@@ -284,15 +280,14 @@
 
                     const isUnlocked = ach.achieved === 1;
                     const badgeClass = isUnlocked ? 'status-unlocked' : 'status-locked';
-                    const badgeText = isUnlocked ? '🏆 Открыто' : '🔒 Закрыто';
+                    const badgeText = isUnlocked ? '🏆 Открыто' : '🔒';
                     const iconClass = isUnlocked ? 'achievement-icon' : 'achievement-icon icon-locked';
                     const descText = ach.description ? ach.description : 'Секретное достижение';
 
-                    // Получаем картинку ачивки. Если бэкенд не прислал icon_url, берем заглушку
                     const iconUrl = ach.icon_url ? ach.icon_url : 'https://community.cloudflare.steamstatic.com/public/images/apps/570/6ee3ec3bc938be94f489f00d8329606d860d70eb.jpg';
 
                     item.innerHTML = `
-                        <img class="${iconClass}" src="${iconUrl}" alt="icon" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=48&h=48&auto=format&fit=crop'">
+                        <img class="${iconClass}" src="${iconUrl}" alt="icon" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=40&h=40&auto=format&fit=crop'">
                         <div class="achievement-info">
                             <div class="achievement-name">${ach.name}</div>
                             <div class="achievement-desc">${descText}</div>

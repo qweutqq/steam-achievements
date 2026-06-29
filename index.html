@@ -39,7 +39,6 @@
             margin: 0 auto;
         }
 
-        /* --- ГЛАВНОЕ МЕНЮ --- */
         .main-header {
             text-align: center;
             margin: 25px 0 15px;
@@ -55,7 +54,6 @@
             letter-spacing: 2px;
         }
 
-        /* ПАНЕЛЬ УПРАВЛЕНИЯ (ПОИСК И ФИЛЬТР) */
         .control-bar {
             display: flex;
             gap: 10px;
@@ -106,7 +104,6 @@
             box-shadow: 0 0 10px rgba(31, 111, 235, 0.4);
         }
 
-        /* СПИСОК ИГР */
         .games-list {
             display: flex;
             flex-direction: column;
@@ -151,16 +148,7 @@
             font-weight: 600;
             color: #f0f6fc;
         }
-        .perfect-badge {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 11px;
-            color: #ffd700;
-            font-weight: 700;
-        }
 
-        /* КНОПКА ЛАЙКА */
         .like-btn {
             background: none;
             border: none;
@@ -179,7 +167,6 @@
             filter: drop-shadow(0 0 6px rgba(244, 63, 94, 0.4));
         }
 
-        /* --- ЭКРАН АЧИВОК --- */
         .back-btn {
             background-color: rgba(33, 38, 45, 0.4);
             backdrop-filter: blur(10px);
@@ -365,14 +352,13 @@
     </div>
 
     <script>
+        // ВНИМАНИЕ: Проверь, чтобы этот URL точно совпадал с адресом твоего бэкенда на Render!
         const BACKEND_URL = 'https://steam-achievements-backend.onrender.com';
         const DEFAULT_BG = "https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=1000&auto=format&fit=crop";
 
         let allGamesRaw = [];
         let searchQuery = '';
         let onlyTracked = false;
-
-        // Загружаем лайкнутые игры из памяти браузера
         let likedGames = JSON.parse(localStorage.getItem('steam_liked_games')) || [];
 
         document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
@@ -381,11 +367,8 @@
             try {
                 const response = await fetch(`${BACKEND_URL}/api/games`);
                 const data = await response.json();
-                if (data.error) throw new Error(data.error);
-
                 allGamesRaw = data.games || [];
                 renderGamesList();
-
             } catch (error) {
                 console.error("Ошибка загрузки игр:", error);
                 document.getElementById('games-container').innerHTML = '<p style="color:red; text-align:center; font-size:13px; margin-top:20px;">Не удалось загрузить библиотеку</p>';
@@ -396,25 +379,16 @@
             const container = document.getElementById('games-container');
             container.innerHTML = '';
 
-            // 1. Фильтруем по поиску и по лайкам на лету
             let filteredGames = allGamesRaw.filter(game => {
                 const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase());
                 const isLiked = likedGames.includes(game.appid);
-
-                if (onlyTracked) {
-                    return matchesSearch && isLiked;
-                }
-                return matchesSearch;
+                return onlyTracked ? (matchesSearch && isLiked) : matchesSearch;
             });
 
-            // 2. Сортируем: Избранные улетают ВВЕРХ, остальные ниже, внутри групп — по алфавиту
             filteredGames.sort((a, b) => {
                 const aLiked = likedGames.includes(a.appid) ? 1 : 0;
                 const bLiked = likedGames.includes(b.appid) ? 1 : 0;
-
-                if (aLiked !== bLiked) {
-                    return bLiked - aLiked;
-                }
+                if (aLiked !== bLiked) return bLiked - aLiked;
                 return a.name.localeCompare(b.name);
             });
 
@@ -426,7 +400,6 @@
             filteredGames.forEach(game => {
                 const row = document.createElement('div');
                 row.className = 'game-row';
-                row.id = `game-row-${game.appid}`;
 
                 const imgUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/header.jpg`;
                 const isLiked = likedGames.includes(game.appid);
@@ -436,9 +409,6 @@
                         <img class="game-avatar" src="${imgUrl}" alt="${game.name}" onerror="this.src='${DEFAULT_BG}'">
                         <div class="game-info">
                             <div class="game-name">${game.name}</div>
-                            <div class="perfect-badge hidden" id="badge-${game.appid}">
-                                <i class="fa-solid fa-trophy"></i> 100%
-                            </div>
                         </div>
                     </div>
                     <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${game.appid}, event)">
@@ -446,8 +416,6 @@
                     </button>
                 `;
                 container.appendChild(row);
-
-                checkGamePerfectStatus(game.appid);
             });
         }
 
@@ -458,43 +426,16 @@
 
         function toggleTrackedFilter() {
             onlyTracked = !onlyTracked;
-            const btn = document.getElementById('tracked-btn');
-            if (onlyTracked) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+            document.getElementById('tracked-btn').classList.toggle('active', onlyTracked);
             renderGamesList();
         }
 
         function toggleLike(gameId, event) {
-            event.stopPropagation(); // Отменяем переход на страницу ачивок при клике на лайк
-
+            event.stopPropagation();
             const index = likedGames.indexOf(gameId);
-            if (index === -1) {
-                likedGames.push(gameId);
-            } else {
-                likedGames.splice(index, 1);
-            }
-
+            if (index === -1) likedGames.push(gameId); else likedGames.splice(index, 1);
             localStorage.setItem('steam_liked_games', JSON.stringify(likedGames));
             renderGamesList();
-        }
-
-        async function checkGamePerfectStatus(gameId) {
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/achievements?game_id=${gameId}`);
-                const data = await response.json();
-                if (data.achievements && data.achievements.length > 0) {
-                    const total = data.achievements.length;
-                    const unlocked = data.achievements.filter(ach => ach.achieved === 1).length;
-
-                    if (total === unlocked && total > 0) {
-                        const badge = document.getElementById(`badge-${gameId}`);
-                        if (badge) badge.classList.remove('hidden');
-                    }
-                }
-            } catch(e) { console.error(e); }
         }
 
         async function loadAchievements(gameId, gameName) {
@@ -518,13 +459,12 @@
                 const response = await fetch(`${BACKEND_URL}/api/achievements?game_id=${gameId}`);
                 const data = await response.json();
 
-                if (data.error || !data.achievements || data.achievements.length === 0) {
+                if (!data.achievements || data.achievements.length === 0) {
                     container.innerHTML = `<p style="color:#8b949e; text-align:center; font-size:13px; margin-top:10px;">У этой игры нет достижений.</p>`;
                     return;
                 }
 
                 container.innerHTML = '';
-
                 const sortedAchievements = data.achievements.sort((a, b) => a.achieved - b.achieved);
 
                 const total = sortedAchievements.length;
@@ -549,8 +489,7 @@
                     const badgeText = isUnlocked ? `<i class="fa-solid fa-trophy"></i> Открыто` : `<i class="fa-solid fa-lock"></i>`;
                     const iconClass = isUnlocked ? 'achievement-icon' : 'achievement-icon icon-locked';
                     const descText = ach.description ? ach.description : 'Секретное достижение';
-
-                    const iconUrl = ach.icon_url ? ach.icon_url : 'https://community.cloudflare.steamstatic.com/public/images/apps/570/6ee3ec3bc938be94f489f00d8329606d860d70eb.jpg';
+                    const iconUrl = ach.icon_url || 'https://community.cloudflare.steamstatic.com/public/images/apps/570/6ee3ec3bc938be94f489f00d8329606d860d70eb.jpg';
 
                     item.innerHTML = `
                         <img class="${iconClass}" src="${iconUrl}" alt="icon" onerror="this.src='${DEFAULT_BG}'">

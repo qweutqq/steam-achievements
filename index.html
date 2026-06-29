@@ -55,16 +55,28 @@
             letter-spacing: 2px;
         }
 
-        /* БЛОК ФИЛЬТРОВ */
-        .filter-bar {
+        /* ПАНЕЛЬ УПРАВЛЕНИЯ (ПОИСК И ФИЛЬТР) */
+        .control-bar {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 5px;
+            align-items: center;
         }
-        .filter-bar::-webkit-scrollbar {
-            display: none;
+        .search-input {
+            flex-grow: 1;
+            background-color: rgba(33, 38, 45, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(48, 54, 61, 0.5);
+            border-radius: 16px;
+            color: #f0f6fc;
+            padding: 8px 14px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: #58a6ff;
         }
         .filter-btn {
             background-color: rgba(33, 38, 45, 0.4);
@@ -72,13 +84,16 @@
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(48, 54, 61, 0.5);
             color: #8b949e;
-            padding: 6px 14px;
+            padding: 8px 14px;
             border-radius: 16px;
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
             white-space: nowrap;
             transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         .filter-btn:hover {
             border-color: #58a6ff;
@@ -89,9 +104,6 @@
             border-color: #58a6ff;
             color: #ffffff;
             box-shadow: 0 0 10px rgba(31, 111, 235, 0.4);
-        }
-        .filter-btn i {
-            margin-right: 4px;
         }
 
         /* СПИСОК ИГР */
@@ -317,11 +329,11 @@
                 </div>
             </header>
 
-            <div class="filter-bar">
-                <button class="filter-btn active" onclick="setFilter('all', this)">Все</button>
-                <button class="filter-btn" onclick="setFilter('tracked', this)"><i class="fa-solid fa-heart" style="color: #f43f5e;"></i> Отслеживаемые</button>
-                <button class="filter-btn" onclick="setFilter('premium', this)">Платные</button>
-                <button class="filter-btn" onclick="setFilter('free', this)">Бесплатные</button>
+            <div class="control-bar">
+                <input type="text" id="search-box" class="search-input" placeholder="Поиск игры..." oninput="handleSearch()">
+                <button id="tracked-btn" class="filter-btn" onclick="toggleTrackedFilter()">
+                    <i class="fa-solid fa-heart" style="color: #f43f5e;"></i> Отслеживаемые
+                </button>
             </div>
 
             <div class="games-list" id="games-container">Загрузка списка игр...</div>
@@ -348,7 +360,7 @@
                 </div>
             </div>
 
-            <div class="achievements-list" id="achievements-container">Загрузка достижения...</div>
+            <div class="achievements-list" id="achievements-container">Загрузка достижений...</div>
         </div>
     </div>
 
@@ -357,10 +369,8 @@
         const DEFAULT_BG = "https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=1000&auto=format&fit=crop";
 
         let allGamesRaw = [];
-        let currentFilter = 'all';
-
-        // Ключевые слова для мгновенной фильтрации F2P игр прямо на клиенте
-        const f2pKeywords = ['dota', 'counter-strike', 'cs:go', 'apex', 'pubg', 'warframe', 'team fortress', 'war thunder', 'world of tanks', 'lost ark', 'unturned', 'brawlhalla', 'destiny 2', 'naraka', 'crossout', 'enlisted', 'paladins', 'smite', 'path of exile', 'halo infinite', 'yu-gi-oh'];
+        let searchQuery = '';
+        let onlyTracked = false;
 
         // Загружаем лайкнутые игры из памяти браузера
         let likedGames = JSON.parse(localStorage.getItem('steam_liked_games')) || [];
@@ -373,13 +383,7 @@
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
 
-                // Обогащаем игры флагом is_free на фронтенде
-                allGamesRaw = (data.games || []).map(game => {
-                    const nameLower = game.name.toLowerCase();
-                    const isFree = f2pKeywords.some(kw => nameLower.includes(kw));
-                    return { ...game, is_free: isFree };
-                });
-
+                allGamesRaw = data.games || [];
                 renderGamesList();
 
             } catch (error) {
@@ -392,16 +396,18 @@
             const container = document.getElementById('games-container');
             container.innerHTML = '';
 
-            // Фильтруем данные
+            // 1. Фильтруем по поиску и по лайкам на лету
             let filteredGames = allGamesRaw.filter(game => {
+                const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase());
                 const isLiked = likedGames.includes(game.appid);
-                if (currentFilter === 'tracked') return isLiked;
-                if (currentFilter === 'free') return game.is_free;
-                if (currentFilter === 'premium') return !game.is_free;
-                return true;
+
+                if (onlyTracked) {
+                    return matchesSearch && isLiked;
+                }
+                return matchesSearch;
             });
 
-            // Сортируем: Избранные улетают ВВЕРХ, остальные ниже, внутри групп — по алфавиту
+            // 2. Сортируем: Избранные улетают ВВЕРХ, остальные ниже, внутри групп — по алфавиту
             filteredGames.sort((a, b) => {
                 const aLiked = likedGames.includes(a.appid) ? 1 : 0;
                 const bLiked = likedGames.includes(b.appid) ? 1 : 0;
@@ -413,7 +419,7 @@
             });
 
             if (filteredGames.length === 0) {
-                container.innerHTML = '<p style="color:#8b949e; text-align:center; font-size:13px; margin-top:20px;">Нет игр в этой категории</p>';
+                container.innerHTML = '<p style="color:#8b949e; text-align:center; font-size:13px; margin-top:20px;">Нет подходящих игр</p>';
                 return;
             }
 
@@ -445,10 +451,19 @@
             });
         }
 
-        function setFilter(filterType, element) {
-            currentFilter = filterType;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
+        function handleSearch() {
+            searchQuery = document.getElementById('search-box').value;
+            renderGamesList();
+        }
+
+        function toggleTrackedFilter() {
+            onlyTracked = !onlyTracked;
+            const btn = document.getElementById('tracked-btn');
+            if (onlyTracked) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
             renderGamesList();
         }
 
@@ -550,7 +565,7 @@
 
             } catch (error) {
                 console.error(error);
-                container.innerHTML = '<p style="color:red; text-align:center; font-size:13px;">Не удалось加载 ачивки</p>';
+                container.innerHTML = '<p style="color:red; text-align:center; font-size:13px;">Не удалось загрузить ачивки</p>';
             }
         }
 

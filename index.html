@@ -219,7 +219,18 @@
                     card.className = 'game-card';
                     card.onclick = () => loadAchievements(game.appid, game.name);
 
+                    // Формируем официальную ссылку на вертикальную обложку игры в Steam
                     const coverUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/library_600x900.jpg`;
+                    // ЗАПАСНОЙ ВАРИАНТ: Горизонтальный баннер (если вертикального нет)
+                    const fallbackUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/header.jpg`;
+
+                    card.innerHTML = `
+                        <img class="game-cover"
+                             src="${coverUrl}"
+                             alt="${game.name}"
+                             onerror="if (this.src != '${fallbackUrl}') { this.src = '${fallbackUrl}'; } else { this.src = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=240&h=320&auto=format&fit=crop'; }">
+                        <div class="game-title">${game.name}</div>
+                    `;
 
                     card.innerHTML = `
                         <img class="game-cover" src="${coverUrl}" alt="${game.name}" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=240&h=320&auto=format&fit=crop'">

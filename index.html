@@ -73,7 +73,7 @@
             try {
                 // ИСПРАВЛЕНО: Меняем http на https и указываем ПРАВИЛЬНЫЙ эндпоинт для списка игр
                 // Замени на имя, которое ты вписал в CHOSEN_SUBDOMAIN:
-                const response = await fetch('https://egor-achievements-tracker-cool.loca.lt/api/games');
+                const response = await fetch('https://steam-achievements-backend.onrender.com/api/games');
                 const data = await response.json();
 
                 // Проверяем, не вернул ли сервер ошибку

@@ -348,7 +348,7 @@
                 </div>
             </div>
 
-            <div class="achievements-list" id="achievements-container">Загрузка достижений...</div>
+            <div class="achievements-list" id="achievements-container">Загрузка достижения...</div>
         </div>
     </div>
 
@@ -358,6 +358,9 @@
 
         let allGamesRaw = [];
         let currentFilter = 'all';
+
+        // Ключевые слова для мгновенной фильтрации F2P игр прямо на клиенте
+        const f2pKeywords = ['dota', 'counter-strike', 'cs:go', 'apex', 'pubg', 'warframe', 'team fortress', 'war thunder', 'world of tanks', 'lost ark', 'unturned', 'brawlhalla', 'destiny 2', 'naraka', 'crossout', 'enlisted', 'paladins', 'smite', 'path of exile', 'halo infinite', 'yu-gi-oh'];
 
         // Загружаем лайкнутые игры из памяти браузера
         let likedGames = JSON.parse(localStorage.getItem('steam_liked_games')) || [];
@@ -370,7 +373,13 @@
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
 
-                allGamesRaw = data.games || [];
+                // Обогащаем игры флагом is_free на фронтенде
+                allGamesRaw = (data.games || []).map(game => {
+                    const nameLower = game.name.toLowerCase();
+                    const isFree = f2pKeywords.some(kw => nameLower.includes(kw));
+                    return { ...game, is_free: isFree };
+                });
+
                 renderGamesList();
 
             } catch (error) {
@@ -541,7 +550,7 @@
 
             } catch (error) {
                 console.error(error);
-                container.innerHTML = '<p style="color:red; text-align:center; font-size:13px;">Не удалось загрузить ачивки</p>';
+                container.innerHTML = '<p style="color:red; text-align:center; font-size:13px;">Не удалось加载 ачивки</p>';
             }
         }
 

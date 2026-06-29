@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steam Achievement Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* БАЗОВЫЕ СТИЛИ (ТЕМНАЯ ТЕМА) */
         body {
             background-color: #000000;
             color: #c9d1d9;
@@ -16,46 +16,30 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* КОНТЕНТ (ОБЕРТКА ДЛЯ ОТСТУПОВ) */
         .content-wrapper {
             padding: 15px;
             position: relative;
-            z-index: 2; /* Всегда поверх фона */
-        }
-
-        /* ШРИФТЫ ДЛЯ ЭМОДЗИ (ДЛЯ ПОДДЕРЖКИ АЙФОНОВСКИХ) */
-        @font-face {
-            font-family: 'AppleColorEmoji';
-            src: local('Apple Color Emoji'), url('https://raw.githubusercontent.com/twa-icons/apple-emoji/main/apple-emoji.ttf') format('truetype');
-            font-display: swap;
-        }
-        .apple-emoji {
-            font-family: 'AppleColorEmoji', sans-serif !important;
-            vertical-align: middle;
-            font-size: 1.1em;
-            line-height: 1;
+            z-index: 2;
         }
 
         /* --- ГЛАВНОЕ МЕНЮ --- */
         .main-header {
             text-align: center;
-            margin: 20px 0 25px;
-            position: relative;
+            margin: 25px 0 25px;
         }
         .main-title {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             color: #58a6ff;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             margin: 0;
         }
-        .main-title img {
-            width: 22px;
-            height: 22px;
+        .main-title i {
+            font-size: 20px;
         }
 
         .games-list {
@@ -69,7 +53,7 @@
             background-color: #161b22;
             border: 1px solid #30363d;
             border-radius: 8px;
-            padding: 8px 10px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -105,40 +89,37 @@
         .perfect-badge {
             display: flex;
             align-items: center;
+            gap: 4px;
             font-size: 11px;
             background-color: rgba(212, 175, 55, 0.12);
             color: #d4af37;
             border: 1px solid rgba(212, 175, 55, 0.3);
-            padding: 3px 6px;
+            padding: 3px 8px;
             border-radius: 10px;
             font-weight: 700;
         }
-        .perfect-badge img {
-            width: 14px;
-            height: 14px;
-            margin-right: 3px;
-        }
 
-        /* --- ЭКРАН АЧИВОК С ПЛАВАЮЩИМ ФОНОМ --- */
+        /* --- ЭКРАН АЧИВОК С БЛЮРОМ И ГРАДИЕНТОМ --- */
         #achievements-view {
             position: relative;
             min-height: 100vh;
         }
 
-        /* КОМПОНЕНТ ФОНА (КАРТИНКА ИГРЫ + ЗАТЕМНЕНИЕ + ГРАДИЕНТ) */
         .game-background-fixed {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 55vh; /* Фиксированная высота для градиента */
-            z-index: 1; /* Под контентом */
+            top: -10px; /* Чуть компенсируем блюр по краям */
+            left: -10px;
+            width: calc(100% + 20px);
+            height: 55vh;
+            z-index: 1;
             background-size: cover;
             background-position: center top;
             background-repeat: no-repeat;
-            opacity: 0.8; /* Небольшая прозрачность */
+            /* Добавляем красивый блюр */
+            filter: blur(8px);
+            opacity: 0.7;
         }
-        /* ЗАТЕМНЕНИЕ */
+        /* ТЕМНАЯ ПОДЛОЖКА ПОВЕРХ БЛЮРА ДЛЯ ЧИТАЕМОСТИ */
         .game-background-fixed::before {
             content: "";
             position: absolute;
@@ -146,20 +127,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); /* Сильное затемнение картинки */
+            background-color: rgba(0, 0, 0, 0.55);
         }
-        /* ПЛАВНЫЙ ГРАДИЕНТ В ЧЕРНЫЙ ВНИЗУ */
+        /* ПЛАВНЫЙ ГРАДИЕНТ В ЧЕРНЫЙ ФОН */
         .game-background-fixed::after {
             content: "";
             position: absolute;
-            bottom: -2px; /* Чуть ниже, чтобы скрыть стык */
+            bottom: -2px;
             left: 0;
             width: 100%;
-            height: 50%; /* Градиент занимает половину картинки */
+            height: 60%;
             background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
         }
 
-        /* Кнопка "Назад" поверх фона */
         .back-btn {
             background-color: rgba(33, 38, 45, 0.6);
             backdrop-filter: blur(5px);
@@ -170,23 +150,23 @@
             cursor: pointer;
             font-weight: 600;
             margin-bottom: 20px;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             position: relative;
             z-index: 3;
-            text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
         }
         .back-btn:hover {
             background-color: rgba(48, 54, 61, 0.7);
         }
 
-        /* Заголовок игры на фоне */
         .game-header-on-bg {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             position: relative;
             z-index: 3;
-            padding-top: 10vh; /* Смещение вниз от кнопки назад */
+            padding-top: 6vh;
         }
         .game-title-text {
             display: inline-flex;
@@ -194,25 +174,31 @@
             justify-content: center;
             gap: 10px;
             color: #f0f6fc;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Тень для читаемости */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
             margin: 0 auto;
             max-width: 90%;
         }
-        .perfect-title-emoji {
-            width: 20px;
-            height: 20px;
+        .perfect-crown-icon {
+            color: #ffd700;
+            font-size: 20px;
+            animation: pulse 2s infinite alternate;
         }
 
-        /* КОНТЕЙНЕР АЧИВОК (НАЧИНАЕТСЯ ТАМ, ГДЕ ЗАКАНЧИВАЕТСЯ ГРАДИЕНТ) */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* КОНТЕЙНЕР АЧИВОК */
         .achievements-container {
             max-width: 600px;
             margin: 0 auto;
             position: relative;
             z-index: 3;
-            background-color: #000000; /* Переход в чистый черный */
-            padding-top: 5px; /* Маленький отступ от градиента */
+            background-color: #000000;
+            padding-top: 5px;
         }
 
         /* ПРОГРЕСС-БАР */
@@ -220,7 +206,7 @@
             background-color: #161b22;
             border: 1px solid #30363d;
             border-radius: 8px;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 12px;
         }
         .progress-text {
@@ -228,13 +214,13 @@
             justify-content: space-between;
             font-size: 12px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             color: #f0f6fc;
         }
         .progress-bar-bg {
             background-color: #21262d;
             border-radius: 4px;
-            height: 7px;
+            height: 6px;
             width: 100%;
             overflow: hidden;
         }
@@ -244,13 +230,12 @@
             width: 0%;
             transition: width 0.35s ease-out;
         }
-        /* Золотой прогресс-бар */
         .progress-container.perfect-game .progress-bar-fill {
             background: linear-gradient(90deg, #ffd700, #d4af37) !important;
         }
         .progress-container.perfect-game {
-            border-color: rgba(212, 175, 55, 0.4) !important;
-            background-color: rgba(212, 175, 55, 0.03) !important;
+            border-color: rgba(212, 175, 55, 0.35) !important;
+            background-color: rgba(212, 175, 55, 0.02) !important;
         }
 
         /* СПИСОК АЧИВОК */
@@ -295,19 +280,17 @@
             font-size: 11px;
             color: #8b949e;
         }
+
+        /* БЭЙДЖИ СТАТУСА */
         .status-badge {
             display: flex;
             align-items: center;
-            gap: 4px;
-            font-size: 10px;
-            padding: 3px 5px;
+            gap: 5px;
+            font-size: 11px;
+            padding: 3px 6px;
             border-radius: 6px;
             font-weight: 700;
             white-space: nowrap;
-        }
-        .status-badge img {
-            width: 11px;
-            height: 11px;
         }
         .status-unlocked {
             background-color: rgba(56, 139, 253, 0.1);
@@ -318,6 +301,7 @@
             background-color: rgba(240, 246, 252, 0.02);
             color: #8b949e;
             border: 1px solid #30363d;
+            padding: 4px 8px;
         }
 
         .hidden { display: none !important; }
@@ -329,7 +313,7 @@
         <div class="content-wrapper">
             <header class="main-header">
                 <div class="main-title">
-                    <img src="https://raw.githubusercontent.com/twa-icons/apple-emoji/main/img/steam.png" alt="steam-logo" class="apple-emoji">
+                    <i class="fa-brands fa-steam"></i>
                     Steam
                 </div>
             </header>
@@ -341,7 +325,9 @@
         <div id="game-bg-image" class="game-background-fixed"></div>
 
         <div class="content-wrapper">
-            <button class="back-btn" onclick="showGamesView()">⬅ К списку игр</button>
+            <button class="back-btn" onclick="showGamesView()">
+                <i class="fa-solid fa-arrow-left"></i> К списку игр
+            </button>
 
             <header class="game-header-on-bg">
                 <div id="selected-game-title" class="game-title-text">Ачивки</div>
@@ -366,11 +352,6 @@
     <script>
         const BACKEND_URL = 'https://steam-achievements-backend.onrender.com';
 
-        // URL-адреса для айфоновских эмодзи (CDN)
-        const EMOJI_CROWN = "https://raw.githubusercontent.com/twa-icons/apple-emoji/main/img/crown.png";
-        const EMOJI_TROPHY = "https://raw.githubusercontent.com/twa-icons/apple-emoji/main/img/trophy.png";
-        const EMOJI_LOCK = "https://raw.githubusercontent.com/twa-icons/apple-emoji/main/img/lock.png";
-
         async function loadGames() {
             try {
                 const response = await fetch(`${BACKEND_URL}/api/games`);
@@ -386,19 +367,19 @@
                     row.id = `game-row-${game.appid}`;
                     row.onclick = () => loadAchievements(game.appid, game.name);
 
-                    // Для аватарок используем header.jpg, он стабилен
                     const imgUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/header.jpg`;
 
                     row.innerHTML = `
                         <img class="game-avatar" src="${imgUrl}" alt="${game.name}" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=38&h=38&auto=format&fit=crop'">
                         <div class="game-info">
                             <div class="game-name">${game.name}</div>
-                            <div class="perfect-badge hidden" id="badge-${game.appid}"><img src="${EMOJI_TROPHY}" alt="trophy" class="apple-emoji"> 100%</div>
+                            <div class="perfect-badge hidden" id="badge-${game.appid}">
+                                <i class="fa-solid fa-trophy"></i> 100%
+                            </div>
                         </div>
                     `;
                     container.appendChild(row);
 
-                    // Фоном проверяем статус
                     checkGamePerfectStatus(game.appid);
                 }
             } catch (error) {
@@ -427,11 +408,9 @@
             document.getElementById('games-view').classList.add('hidden');
             document.getElementById('achievements-view').classList.remove('hidden');
 
-            // Устанавливаем заголовок без корон (короны добавим ниже, если нужно)
             const titleElement = document.getElementById('selected-game-title');
             titleElement.innerText = gameName;
 
-            // Устанавливаем затемненный фон (картинку игры)
             const bgElement = document.getElementById('game-bg-image');
             const imgUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${gameId}/header.jpg`;
             bgElement.style.backgroundImage = `url('${imgUrl}')`;
@@ -464,11 +443,10 @@
                 document.getElementById('progress-percent').innerText = `${percent}%`;
                 document.getElementById('progress-bar-fill').style.width = `${percent}%`;
 
-                // Если игра пройдена на 100%
                 if (percent === 100) {
                     progressBlock.classList.add('perfect-game');
-                    // Добавляем айфоновскую корону к названию игры
-                    titleElement.innerHTML = `<img src="${EMOJI_CROWN}" alt="crown" class="apple-emoji perfect-title-emoji"> ${gameName}`;
+                    // Добавляем золотую корону FontAwesome к названию игры
+                    titleElement.innerHTML = `<i class="fa-solid fa-crown perfect-crown-icon"></i> ${gameName}`;
                 }
 
                 data.achievements.forEach(ach => {
@@ -477,8 +455,8 @@
 
                     const isUnlocked = ach.achieved === 1;
                     const badgeClass = isUnlocked ? 'status-unlocked' : 'status-locked';
-                    // Меняем смайлики на иконки-картинки Apple
-                    const badgeText = isUnlocked ? `<img src="${EMOJI_TROPHY}" alt="trophy" class="apple-emoji"> Открыто` : `<img src="${EMOJI_LOCK}" alt="lock" class="apple-emoji">`;
+                    // Векторные иконки кубка и замка
+                    const badgeText = isUnlocked ? `<i class="fa-solid fa-trophy"></i> Открыто` : `<i class="fa-solid fa-lock"></i>`;
                     const iconClass = isUnlocked ? 'achievement-icon' : 'achievement-icon icon-locked';
                     const descText = ach.description ? ach.description : 'Секретное достижение';
 

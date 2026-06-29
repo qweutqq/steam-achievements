@@ -61,7 +61,6 @@
             height: 40px;
         }
 
-        /* СТИЛИ ДЛЯ АЧИВОК */
         .hidden {
             display: none !important;
         }
@@ -83,6 +82,37 @@
             max-width: 600px;
             margin: 0 auto;
         }
+
+        /* ПРОГРЕСС-БАР */
+        .progress-container {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #f0f6fc;
+        }
+        .progress-bar-bg {
+            background-color: #21262d;
+            border-radius: 6px;
+            height: 12px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #58a6ff, #1f6feb);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+
         .achievements-list {
             display: flex;
             flex-direction: column;
@@ -95,13 +125,29 @@
             padding: 12px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 15px;
         }
+
+        /* ИКОНКИ АЧИВОК */
+        .achievement-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            object-fit: cover;
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            flex-shrink: 0;
+        }
+        /* Серые иконки для закрытых ачивок */
+        .icon-locked {
+            filter: grayscale(100%) opacity(60%);
+        }
+
         .achievement-info {
             display: flex;
             flex-direction: column;
             gap: 4px;
+            flex-grow: 1;
         }
         .achievement-name {
             font-weight: bold;
@@ -140,7 +186,18 @@
     <div id="achievements-view" class="hidden">
         <button class="back-btn" onclick="showGamesView()">⬅ К списку игр</button>
         <h1 id="selected-game-title">Ачивки</h1>
+
         <div class="achievements-container">
+            <div class="progress-container">
+                <div class="progress-text">
+                    <span id="progress-stats">Выполнено: 0 из 0</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+
             <div class="achievements-list" id="achievements-container">Загрузка достижений...</div>
         </div>
     </div>
@@ -148,12 +205,10 @@
     <script>
         const BACKEND_URL = 'https://steam-achievements-backend.onrender.com';
 
-        // 1. Загрузка списка игр
         async function loadGames() {
             try {
                 const response = await fetch(`${BACKEND_URL}/api/games`);
                 const data = await response.json();
-
                 if (data.error) throw new Error(data.error);
 
                 const container = document.getElementById('games-container');
@@ -162,7 +217,6 @@
                 data.games.forEach(game => {
                     const card = document.createElement('div');
                     card.className = 'game-card';
-                    // Добавляем клик на карточку
                     card.onclick = () => loadAchievements(game.appid, game.name);
 
                     const coverUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/library_600x900.jpg`;
@@ -179,9 +233,7 @@
             }
         }
 
-        // 2. Загрузка ачивок для конкретной игры
         async function loadAchievements(gameId, gameName) {
-            // Переключаем экраны
             document.getElementById('games-view').classList.add('hidden');
             document.getElementById('achievements-view').classList.remove('hidden');
             document.getElementById('selected-game-title').innerText = gameName;
@@ -189,28 +241,47 @@
             const container = document.getElementById('achievements-container');
             container.innerHTML = 'Загрузка достижений...';
 
+            // Сбрасываем прогресс-бар в 0 перед загрузкой
+            document.getElementById('progress-bar-fill').style.width = '0%';
+            document.getElementById('progress-stats').innerText = 'Выполнено: 0 из 0';
+            document.getElementById('progress-percent').innerText = '0%';
+
             try {
                 const response = await fetch(`${BACKEND_URL}/api/achievements?game_id=${gameId}`);
                 const data = await response.json();
 
-                if (data.error || !data.achievements) {
-                    container.innerHTML = `<p style="color:#8b949e; text-align:center;">${data.error || "У этой игры нет достижений или они скрыты."}</p>`;
+                if (data.error || !data.achievements || data.achievements.length === 0) {
+                    container.innerHTML = `<p style="color:#8b949e; text-align:center;">${data.error || "У этой игры нет достижений."}</p>`;
                     return;
                 }
 
                 container.innerHTML = '';
 
+                // Считаем прогресс
+                const total = data.achievements.length;
+                const unlocked = data.achievements.filter(ach => ach.achieved === 1).length;
+                const percent = Math.round((unlocked / total) * 100);
+
+                // Обновляем прогресс-бар на экране
+                document.getElementById('progress-stats').innerText = `Выполнено: ${unlocked} из ${total}`;
+                document.getElementById('progress-percent').innerText = `${percent}%`;
+                document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+
                 data.achievements.forEach(ach => {
                     const item = document.createElement('div');
                     item.className = 'achievement-item';
 
-                    // Проверяем статус: 1 = разблокировано, 0 = закрыто
                     const isUnlocked = ach.achieved === 1;
                     const badgeClass = isUnlocked ? 'status-unlocked' : 'status-locked';
                     const badgeText = isUnlocked ? '🏆 Открыто' : '🔒 Закрыто';
-                    const descText = ach.description ? ach.description : 'Секретное достижение или описание отсутствует';
+                    const iconClass = isUnlocked ? 'achievement-icon' : 'achievement-icon icon-locked';
+                    const descText = ach.description ? ach.description : 'Секретное достижение';
+
+                    // Получаем картинку ачивки. Если бэкенд не прислал icon_url, берем заглушку
+                    const iconUrl = ach.icon_url ? ach.icon_url : 'https://community.cloudflare.steamstatic.com/public/images/apps/570/6ee3ec3bc938be94f489f00d8329606d860d70eb.jpg';
 
                     item.innerHTML = `
+                        <img class="${iconClass}" src="${iconUrl}" alt="icon" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=48&h=48&auto=format&fit=crop'">
                         <div class="achievement-info">
                             <div class="achievement-name">${ach.name}</div>
                             <div class="achievement-desc">${descText}</div>
@@ -226,13 +297,11 @@
             }
         }
 
-        // 3. Вернуться обратно к списку игр
         function showGamesView() {
             document.getElementById('achievements-view').classList.add('hidden');
             document.getElementById('games-view').classList.remove('hidden');
         }
 
-        // Старт
         loadGames();
     </script>
 </body>

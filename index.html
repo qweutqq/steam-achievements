@@ -28,12 +28,12 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            filter: blur(25px); /* Мощный красивый блюр */
-            opacity: 0.45; /* Прозрачность, чтобы не слепило */
+            filter: blur(25px);
+            opacity: 0.45;
             transition: background-image 0.5s ease-in-out;
         }
 
-        /* Общая обертка для контента, которая скроллится поверх фиксированного фона */
+        /* Общая обертка для контента */
         .content-wrapper {
             position: relative;
             z-index: 2;
@@ -45,7 +45,7 @@
         /* --- ГЛАВНОЕ МЕНЮ --- */
         .main-header {
             text-align: center;
-            margin: 25px 0;
+            margin: 25px 0 15px;
         }
         .main-title {
             display: inline-flex;
@@ -58,15 +58,77 @@
             letter-spacing: 2px;
         }
 
-        /* СПИСОК ИГР (БЕЗ ЧЕРНЫХ ПРЯМОУГОЛЬНИКОВ) */
+        /* УМНЫЙ ПОИСК И ФИЛЬТРЫ */
+        .search-filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            color: #8b949e;
+            font-size: 14px;
+        }
+        .search-input {
+            width: 100%;
+            background-color: rgba(22, 27, 34, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(48, 54, 61, 0.8);
+            border-radius: 10px;
+            padding: 12px 12px 12px 42px;
+            color: #f0f6fc;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+        .search-input:focus {
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+        }
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        .tab-btn {
+            background: rgba(33, 38, 45, 0.4);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(48, 54, 61, 0.6);
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tab-btn.active {
+            background: rgba(88, 166, 255, 0.15);
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+
+        /* СПИСОК ИГР */
         .games-list {
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
         .game-row {
-            background: transparent; /* Убрали черный плашечный фон */
-            border-bottom: 1px solid rgba(48, 54, 61, 0.4); /* Только тонкая разделительная линия */
+            background: transparent;
+            border-bottom: 1px solid rgba(48, 54, 61, 0.4);
             padding: 12px 6px;
             display: flex;
             align-items: center;
@@ -96,6 +158,13 @@
             font-size: 15px;
             font-weight: 600;
             color: #f0f6fc;
+            padding-right: 10px;
+        }
+        .game-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
         }
         .perfect-badge {
             display: flex;
@@ -105,6 +174,24 @@
             color: #ffd700;
             font-weight: 700;
             text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+        }
+        .fav-btn {
+            background: none;
+            border: none;
+            color: #8b949e;
+            cursor: pointer;
+            padding: 6px;
+            font-size: 16px;
+            transition: transform 0.15s, color 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .fav-btn:hover {
+            transform: scale(1.15);
+        }
+        .fav-btn.is-fav {
+            color: #f43f5e;
         }
 
         /* --- ЭКРАН АЧИВОК --- */
@@ -143,7 +230,7 @@
             font-size: 22px;
         }
 
-        /* ПРОГРЕСС-БАР (ЧИСТЫЙ СТИЛЬ) */
+        /* ПРОГРЕСС-БАР */
         .progress-container {
             background-color: rgba(22, 27, 34, 0.4);
             backdrop-filter: blur(10px);
@@ -180,14 +267,14 @@
             border-color: rgba(212, 175, 55, 0.4) !important;
         }
 
-        /* СПИСОК АЧИВОК (БЕЗ ЧЕРНОГО ЗАДНИКА) */
+        /* СПИСОК АЧИВОК */
         .achievements-list {
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
         .achievement-item {
-            background-color: rgba(22, 27, 34, 0.35); /* Прозрачный темный налет, чтобы читался текст */
+            background-color: rgba(22, 27, 34, 0.35);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
             border: 1px solid rgba(48, 54, 61, 0.3);
@@ -258,6 +345,18 @@
                     <i class="fa-brands fa-steam"></i> Steam
                 </div>
             </header>
+
+            <div class="search-filter-container">
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="search-input" class="search-input" placeholder="Поиск игры по названию..." oninput="renderGames()">
+                </div>
+                <div class="filter-tabs">
+                    <button id="tab-all" class="tab-btn active" onclick="setFilter('all')">Все игры</button>
+                    <button id="tab-fav" class="tab-btn" onclick="setFilter('fav')"><i class="fa-solid fa-heart"></i> Отслеживаемые</button>
+                </div>
+            </div>
+
             <div class="games-list" id="games-container">Загрузка списка игр...</div>
         </div>
     </div>
@@ -288,10 +387,12 @@
 
     <script>
         const BACKEND_URL = 'https://steam-achievements-backend.onrender.com';
-        // Дефолтный красивый фон для главного меню (логотип Steam или темный абстракт)
         const DEFAULT_BG = "https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=1000&auto=format&fit=crop";
 
-        // Ставим дефолтный фон при старте
+        let allGames = []; // Память для мгновенного поиска
+        let currentFilter = 'all'; // Текущая вкладка ('all' или 'fav')
+        const perfectGamesCache = {}; // Кэш для кубков 100%, чтобы не спамить бэкенд
+
         document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
 
         async function loadGames() {
@@ -300,33 +401,86 @@
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
 
-                const container = document.getElementById('games-container');
-                container.innerHTML = '';
-
-                data.games.forEach(game => {
-                    const row = document.createElement('div');
-                    row.className = 'game-row';
-                    row.onclick = () => loadAchievements(game.appid, game.name);
-
-                    const imgUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/header.jpg`;
-
-                    row.innerHTML = `
-                        <img class="game-avatar" src="${imgUrl}" alt="${game.name}" onerror="this.src='${DEFAULT_BG}'">
-                        <div class="game-info">
-                            <div class="game-name">${game.name}</div>
-                            <div class="perfect-badge hidden" id="badge-${game.appid}">
-                                <i class="fa-solid fa-trophy"></i> 100%
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(row);
-
-                    checkGamePerfectStatus(game.appid);
-                });
+                allGames = data.games || [];
+                renderGames();
             } catch (error) {
                 console.error("Ошибка загрузки игр:", error);
                 document.getElementById('games-container').innerHTML = '<p style="color:red; text-align:center; font-size:13px; margin-top:20px;">Не удалось загрузить библиотеку</p>';
             }
+        }
+
+        // ДИНАМИЧЕСКИЙ РЕНДЕРИНГ С УЧЕТОМ ПОИСКА И ЛАЙКОВ
+        function renderGames() {
+            const container = document.getElementById('games-container');
+            container.innerHTML = '';
+
+            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            const favorites = JSON.parse(localStorage.getItem('steam_favorites') || '[]');
+
+            // Фильтруем массив по буквам и по вкладке Избранного
+            const filteredGames = allGames.filter(game => {
+                const matchesSearch = game.name.toLowerCase().includes(searchQuery);
+                const matchesFilter = currentFilter === 'all' || favorites.includes(game.appid);
+                return matchesSearch && matchesFilter;
+            });
+
+            if (filteredGames.length === 0) {
+                container.innerHTML = '<p style="color:#8b949e; text-align:center; font-size:13px; margin-top:20px;">Игры не найдены</p>';
+                return;
+            }
+
+            filteredGames.forEach(game => {
+                const row = document.createElement('div');
+                row.className = 'game-row';
+                row.onclick = () => loadAchievements(game.appid, game.name);
+
+                const imgUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.appid}/header.jpg`;
+                const isFav = favorites.includes(game.appid);
+
+                row.innerHTML = `
+                    <img class="game-avatar" src="${imgUrl}" alt="${game.name}" onerror="this.src='${DEFAULT_BG}'">
+                    <div class="game-info">
+                        <div class="game-name">${game.name}</div>
+                        <div class="game-meta">
+                            <div class="perfect-badge ${perfectGamesCache[game.appid] ? '' : 'hidden'}" id="badge-${game.appid}">
+                                <i class="fa-solid fa-trophy"></i> 100%
+                            </div>
+                            <button class="fav-btn ${isFav ? 'is-fav' : ''}" onclick="toggleFavorite(event, ${game.appid})">
+                                <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(row);
+
+                // Если статус игры еще не запрашивался, запрашиваем один раз
+                if (perfectGamesCache[game.appid] === undefined) {
+                    checkGamePerfectStatus(game.appid);
+                }
+            });
+        }
+
+        // ПЕРЕКЛЮЧЕНИЕ СЕРДЕЧКА (ЛАЙКА)
+        function toggleFavorite(event, gameId) {
+            event.stopPropagation(); // ВАЖНО: останавливает клик, чтобы не открывался экран ачивок
+            let favorites = JSON.parse(localStorage.getItem('steam_favorites') || '[]');
+
+            if (favorites.includes(gameId)) {
+                favorites = favorites.filter(id => id !== gameId);
+            } else {
+                favorites.push(gameId);
+            }
+
+            localStorage.setItem('steam_favorites', JSON.stringify(favorites));
+            renderGames(); // Мгновенно обновляем интерфейс
+        }
+
+        // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+        function setFilter(filterType) {
+            currentFilter = filterType;
+            document.getElementById('tab-all').classList.toggle('active', filterType === 'all');
+            document.getElementById('tab-fav').classList.toggle('active', filterType === 'fav');
+            renderGames();
         }
 
         async function checkGamePerfectStatus(gameId) {
@@ -338,11 +492,18 @@
                     const unlocked = data.achievements.filter(ach => ach.achieved === 1).length;
 
                     if (total === unlocked && total > 0) {
+                        perfectGamesCache[gameId] = true;
                         const badge = document.getElementById(`badge-${gameId}`);
                         if (badge) badge.classList.remove('hidden');
+                    } else {
+                        perfectGamesCache[gameId] = false;
                     }
+                } else {
+                    perfectGamesCache[gameId] = false;
                 }
-            } catch(e) { console.error(e); }
+            } catch(e) {
+                perfectGamesCache[gameId] = false;
+            }
         }
 
         async function loadAchievements(gameId, gameName) {
@@ -352,7 +513,6 @@
             const titleElement = document.getElementById('selected-game-title');
             titleElement.innerText = gameName;
 
-            // Мягко меняем глобальный размытый фон под выбранную игру
             const imgUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${gameId}/header.jpg`;
             document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${imgUrl}')`;
 
@@ -374,9 +534,7 @@
 
                 container.innerHTML = '';
 
-                // СОРТИРОВКА: Сначала НЕПОЛУЧЕННЫЕ (achieved === 0), потом ПОЛУЧЕННЫЕ (achieved === 1)
                 const sortedAchievements = data.achievements.sort((a, b) => a.achieved - b.achieved);
-
                 const total = sortedAchievements.length;
                 const unlocked = sortedAchievements.filter(ach => ach.achieved === 1).length;
                 const percent = Math.round((unlocked / total) * 100);
@@ -399,7 +557,6 @@
                     const badgeText = isUnlocked ? `<i class="fa-solid fa-trophy"></i> Открыто` : `<i class="fa-solid fa-lock"></i>`;
                     const iconClass = isUnlocked ? 'achievement-icon' : 'achievement-icon icon-locked';
                     const descText = ach.description ? ach.description : 'Секретное достижение';
-
                     const iconUrl = ach.icon_url ? ach.icon_url : 'https://community.cloudflare.steamstatic.com/public/images/apps/570/6ee3ec3bc938be94f489f00d8329606d860d70eb.jpg';
 
                     item.innerHTML = `
@@ -422,8 +579,8 @@
         function showGamesView() {
             document.getElementById('achievements-view').classList.add('hidden');
             document.getElementById('games-view').classList.remove('hidden');
-            // При возврате ставим дефолтный фон обратно
             document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
+            renderGames(); // Перерендеринг на случай, если убрали лайк в другом месте
         }
 
         loadGames();

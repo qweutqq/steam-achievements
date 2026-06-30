@@ -381,7 +381,7 @@
                 </div>
             </div>
 
-            <div class="achievements-list" id="achievements-container">Загрузка достижений...</div>
+            <div class="achievements-list" id="achievements-container">Загрузка achievements...</div>
         </div>
     </div>
 
@@ -389,9 +389,12 @@
         const BACKEND_URL = 'https://steam-achievements-backend.onrender.com';
         const DEFAULT_BG = "https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=1000&auto=format&fit=crop";
 
-        let allGames = []; // Память для мгновенного поиска
-        let currentFilter = 'all'; // Текущая вкладка ('all' или 'fav')
-        const perfectGamesCache = {}; // Кэш для кубков 100%, чтобы не спамить бэкенд
+        let allGames = [];
+        let currentFilter = 'all';
+        const perfectGamesCache = {};
+
+        // Переменная для хранения позиции скролла
+        let savedScrollPosition = 0;
 
         document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
 
@@ -409,7 +412,6 @@
             }
         }
 
-        // ДИНАМИЧЕСКИЙ РЕНДЕРИНГ С УЧЕТОМ ПОИСКА И ЛАЙКОВ
         function renderGames() {
             const container = document.getElementById('games-container');
             container.innerHTML = '';
@@ -417,7 +419,6 @@
             const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
             const favorites = JSON.parse(localStorage.getItem('steam_favorites') || '[]');
 
-            // Фильтруем массив по буквам и по вкладке Избранного
             const filteredGames = allGames.filter(game => {
                 const matchesSearch = game.name.toLowerCase().includes(searchQuery);
                 const matchesFilter = currentFilter === 'all' || favorites.includes(game.appid);
@@ -453,16 +454,14 @@
                 `;
                 container.appendChild(row);
 
-                // Если статус игры еще не запрашивался, запрашиваем один раз
                 if (perfectGamesCache[game.appid] === undefined) {
                     checkGamePerfectStatus(game.appid);
                 }
             });
         }
 
-        // ПЕРЕКЛЮЧЕНИЕ СЕРДЕЧКА (ЛАЙКА)
         function toggleFavorite(event, gameId) {
-            event.stopPropagation(); // ВАЖНО: останавливает клик, чтобы не открывался экран ачивок
+            event.stopPropagation();
             let favorites = JSON.parse(localStorage.getItem('steam_favorites') || '[]');
 
             if (favorites.includes(gameId)) {
@@ -472,10 +471,9 @@
             }
 
             localStorage.setItem('steam_favorites', JSON.stringify(favorites));
-            renderGames(); // Мгновенно обновляем интерфейс
+            renderGames();
         }
 
-        // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
         function setFilter(filterType) {
             currentFilter = filterType;
             document.getElementById('tab-all').classList.toggle('active', filterType === 'all');
@@ -507,8 +505,14 @@
         }
 
         async function loadAchievements(gameId, gameName) {
+            // ФИШКА ТУТ: Сохраняем текущую позицию скролла перед скрытием меню
+            savedScrollPosition = window.scrollY;
+
             document.getElementById('games-view').classList.add('hidden');
             document.getElementById('achievements-view').classList.remove('hidden');
+
+            // Автоматически откручиваем экран ачивок наверх, чтобы не смотреть в пустоту
+            window.scrollTo(0, 0);
 
             const titleElement = document.getElementById('selected-game-title');
             titleElement.innerText = gameName;
@@ -580,7 +584,11 @@
             document.getElementById('achievements-view').classList.add('hidden');
             document.getElementById('games-view').classList.remove('hidden');
             document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
-            renderGames(); // Перерендеринг на случай, если убрали лайк в другом месте
+
+            renderGames();
+
+            // ФИШКА ТУТ: Возвращаем пользователя ровно на ту высоту, где он кликнул по игре
+            window.scrollTo(0, savedScrollPosition);
         }
 
         loadGames();

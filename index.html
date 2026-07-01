@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steam Achievement Tracker</title>
+    <title>Multi-Platform Achievement Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* БАЗОВЫЙ СКВОЗНОЙ СТИЛЬ */
@@ -29,7 +29,7 @@
             background-position: center;
             background-repeat: no-repeat;
             filter: blur(25px);
-            opacity: 0.45;
+            opacity: 0.35;
             transition: background-image 0.5s ease-in-out;
         }
 
@@ -42,17 +42,148 @@
             margin: 0 auto;
         }
 
-        /* --- ГЛАВНОЕ МЕНЮ --- */
+        /* КНОПКИ НАВИГАЦИИ (НАЗАД) */
+        .back-btn {
+            background-color: rgba(33, 38, 45, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #58a6ff;
+            border: 1px solid rgba(48, 54, 61, 0.6);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+        /* --- 0. ГЛАВНЫЙ ЭКРАН (DASHBOARD) --- */
+        .dashboard-header {
+            text-align: center;
+            margin: 40px 0 30px;
+        }
+        .dashboard-title {
+            color: #f0f6fc;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        .dashboard-subtitle {
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin: 25px 0 12px 5px;
+        }
+
+        /* Список игровых платформ */
+        .platform-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .platform-card {
+            background: rgba(22, 27, 34, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(48, 54, 61, 0.7);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s, background-color 0.2s;
+        }
+        .platform-card:not(.disabled):hover {
+            transform: translateY(-2px);
+            background-color: rgba(33, 38, 45, 0.5);
+        }
+        .platform-card.steam-card:not(.disabled):hover { border-color: #1b2838; box-shadow: 0 0 15px rgba(102, 192, 244, 0.1); }
+
+        .platform-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .platform-icon {
+            font-size: 28px;
+            width: 40px;
+            text-align: center;
+        }
+        .steam-icon { color: #66c0f4; }
+        .ps-icon { color: #00439c; }
+
+        .platform-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .platform-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f0f6fc;
+        }
+        .platform-status {
+            font-size: 12px;
+            color: #7ee787;
+        }
+
+        /* Заблокированная карточка (PS) */
+        .platform-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+        .platform-card.disabled .platform-status {
+            color: #8b949e;
+        }
+        .coming-soon-badge {
+            background: rgba(240, 246, 252, 0.05);
+            border: 1px solid rgba(48, 54, 61, 0.8);
+            color: #8b949e;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        /* Блок настроек */
+        .settings-box {
+            background: rgba(22, 27, 34, 0.25);
+            border: 1px solid rgba(48, 54, 61, 0.4);
+            border-radius: 12px;
+            padding: 14px;
+        }
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #c9d1d9;
+        }
+
+        /* --- I. ЭКРАН ИГР СТИМА --- */
         .main-header {
             text-align: center;
-            margin: 25px 0 15px;
+            margin: 10px 0 15px;
         }
         .main-title {
             display: inline-flex;
             align-items: center;
             gap: 10px;
             color: #58a6ff;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -194,24 +325,7 @@
             color: #f43f5e;
         }
 
-        /* --- ЭКРАН АЧИВОК --- */
-        .back-btn {
-            background-color: rgba(33, 38, 45, 0.4);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: #58a6ff;
-            border: 1px solid rgba(48, 54, 61, 0.6);
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-        }
-
+        /* --- II. ЭКРАН АЧИВОК --- */
         .game-header-inside {
             text-align: center;
             margin: 10px 0 25px;
@@ -338,11 +452,57 @@
 
     <div id="global-dynamic-bg" class="global-bg"></div>
 
-    <div id="games-view">
+    <div id="main-dashboard">
         <div class="content-wrapper">
+            <header class="dashboard-header">
+                <div class="dashboard-title">Trophy Hub</div>
+                <div class="dashboard-subtitle">Все твои игровые достижения в одном месте</div>
+            </header>
+
+            <div class="section-title">Игровые Платформы</div>
+            <div class="platform-list">
+                <div class="platform-card steam-card" onclick="showGamesView()">
+                    <div class="platform-left">
+                        <i class="fa-brands fa-steam platform-icon steam-icon"></i>
+                        <div class="platform-meta">
+                            <span class="platform-name">Steam библиотека</span>
+                            <span class="platform-status"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Подключено</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="color: #8b949e; font-size: 14px;"></i>
+                </div>
+
+                <div class="platform-card disabled">
+                    <div class="platform-left">
+                        <i class="fa-brands fa-playstation platform-icon ps-icon"></i>
+                        <div class="platform-meta">
+                            <span class="platform-name">PlayStation Network</span>
+                            <span class="platform-status">Не подключено</span>
+                        </div>
+                    </div>
+                    <span class="coming-soon-badge">Скоро</span>
+                </div>
+            </div>
+
+            <div class="section-title">Настройки приложения</div>
+            <div class="settings-box">
+                <div class="settings-item">
+                    <span>Текущая версия трекера</span>
+                    <span style="color: #8b949e; font-weight: bold;">v2.0-multi</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="games-view" class="hidden">
+        <div class="content-wrapper">
+            <button class="back-btn" onclick="showDashboardView()">
+                <i class="fa-solid fa-arrow-left"></i> На главную
+            </button>
+
             <header class="main-header">
                 <div class="main-title">
-                    <i class="fa-brands fa-steam"></i> Steam
+                    <i class="fa-brands fa-steam"></i> Steam библиотека
                 </div>
             </header>
 
@@ -363,7 +523,7 @@
 
     <div id="achievements-view" class="hidden">
         <div class="content-wrapper">
-            <button class="back-btn" onclick="showGamesView()">
+            <button class="back-btn" onclick="showGamesViewFromAchievements()">
                 <i class="fa-solid fa-arrow-left"></i> К списку игр
             </button>
 
@@ -393,8 +553,9 @@
         let currentFilter = 'all';
         const perfectGamesCache = {};
 
-        // Переменная для хранения позиции скролла
+        // Переменная для сохранения позиции скролла списка игр
         let savedScrollPosition = 0;
+        let isGamesLoadedOnce = false;
 
         document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
 
@@ -405,6 +566,7 @@
                 if (data.error) throw new Error(data.error);
 
                 allGames = data.games || [];
+                isGamesLoadedOnce = true;
                 renderGames();
             } catch (error) {
                 console.error("Ошибка загрузки игр:", error);
@@ -505,13 +667,12 @@
         }
 
         async function loadAchievements(gameId, gameName) {
-            // ФИШКА ТУТ: Сохраняем текущую позицию скролла перед скрытием меню
+            // Запоминаем скролл списка перед уходом на экран достижений
             savedScrollPosition = window.scrollY;
 
             document.getElementById('games-view').classList.add('hidden');
             document.getElementById('achievements-view').classList.remove('hidden');
 
-            // Автоматически откручиваем экран ачивок наверх, чтобы не смотреть в пустоту
             window.scrollTo(0, 0);
 
             const titleElement = document.getElementById('selected-game-title');
@@ -580,18 +741,41 @@
             }
         }
 
+        // НАВИГАЦИЯ: Из Dashboard на экран списка игр Steam
         function showGamesView() {
+            document.getElementById('main-dashboard').classList.add('hidden');
+            document.getElementById('games-view').classList.remove('hidden');
+
+            // Загружаем API только один раз при первом входе на вкладку
+            if (!isGamesLoadedOnce) {
+                loadGames();
+            } else {
+                renderGames();
+                // Если мы вернулись с экрана Дашборда, скроллим обратно на сохраненное место списка
+                window.scrollTo(0, savedScrollPosition);
+            }
+        }
+
+        // НАВИГАЦИЯ: С ачивок возвращаемся в список игр Steam (с сохранением скролла!)
+        function showGamesViewFromAchievements() {
             document.getElementById('achievements-view').classList.add('hidden');
             document.getElementById('games-view').classList.remove('hidden');
             document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
 
             renderGames();
-
-            // ФИШКА ТУТ: Возвращаем пользователя ровно на ту высоту, где он кликнул по игре
             window.scrollTo(0, savedScrollPosition);
         }
 
-        loadGames();
+        // НАВИГАЦИЯ: Со списка игр Steam обратно на Dashboard
+        function showDashboardView() {
+            // Сохраняем положение скролла списка игр, чтобы не терять его при повторном клике на Steam
+            savedScrollPosition = window.scrollY;
+
+            document.getElementById('games-view').classList.add('hidden');
+            document.getElementById('main-dashboard').classList.remove('hidden');
+            document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
+            window.scrollTo(0, 0);
+        }
     </script>
 </body>
 </html>

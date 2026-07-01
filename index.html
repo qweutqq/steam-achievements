@@ -86,7 +86,6 @@
             margin: 25px 0 12px 5px;
         }
 
-        /* Список игровых платформ */
         .platform-list {
             display: flex;
             flex-direction: column;
@@ -139,15 +138,12 @@
             color: #7ee787;
         }
 
-        /* Заблокированная карточка (PS) */
         .platform-card.disabled {
             opacity: 0.5;
             cursor: not-allowed;
             border-style: dashed;
         }
-        .platform-card.disabled .platform-status {
-            color: #8b949e;
-        }
+        .platform-card.disabled .platform-status { color: #8b949e; }
         .coming-soon-badge {
             background: rgba(240, 246, 252, 0.05);
             border: 1px solid rgba(48, 54, 61, 0.8);
@@ -158,7 +154,6 @@
             font-weight: 600;
         }
 
-        /* Блок настроек */
         .settings-box {
             background: rgba(22, 27, 34, 0.25);
             border: 1px solid rgba(48, 54, 61, 0.4);
@@ -189,7 +184,6 @@
             letter-spacing: 2px;
         }
 
-        /* УМНЫЙ ПОИСК И ФИЛЬТРЫ */
         .search-filter-container {
             margin-bottom: 20px;
             display: flex;
@@ -225,9 +219,17 @@
             border-color: #58a6ff;
             box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
         }
+
+        /* Сортировка и вкладки в один ряд */
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
         .filter-tabs {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
         .tab-btn {
             background: rgba(33, 38, 45, 0.4);
@@ -235,7 +237,7 @@
             -webkit-backdrop-filter: blur(5px);
             border: 1px solid rgba(48, 54, 61, 0.6);
             color: #8b949e;
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
@@ -249,6 +251,19 @@
             background: rgba(88, 166, 255, 0.15);
             border-color: #58a6ff;
             color: #58a6ff;
+        }
+
+        /* Селектор сортировки */
+        .sort-select {
+            background: rgba(33, 38, 45, 0.6);
+            border: 1px solid rgba(48, 54, 61, 0.8);
+            color: #f0f6fc;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
         }
 
         /* СПИСОК ИГР */
@@ -272,14 +287,11 @@
             padding-left: 10px;
         }
 
-        /* Фишка: Красивое золотое свечение для 100% идеальных игр */
         .game-row.perfect-glow {
             border-bottom-color: rgba(255, 215, 0, 0.25);
             box-shadow: 0 1px 8px rgba(255, 215, 0, 0.05);
         }
-        .game-row.perfect-glow:hover {
-            background-color: rgba(255, 215, 0, 0.03);
-        }
+        .game-row.perfect-glow:hover { background-color: rgba(255, 215, 0, 0.03); }
 
         .game-avatar {
             width: 42px;
@@ -328,12 +340,8 @@
             align-items: center;
             justify-content: center;
         }
-        .fav-btn:hover {
-            transform: scale(1.15);
-        }
-        .fav-btn.is-fav {
-            color: #f43f5e;
-        }
+        .fav-btn:hover { transform: scale(1.15); }
+        .fav-btn.is-fav { color: #f43f5e; }
 
         /* --- II. ЭКРАН АЧИВОК --- */
         .game-header-inside {
@@ -354,7 +362,6 @@
             font-size: 22px;
         }
 
-        /* ПРОГРЕСС-БАР */
         .progress-container {
             background-color: rgba(22, 27, 34, 0.4);
             backdrop-filter: blur(10px);
@@ -384,14 +391,9 @@
             width: 0%;
             transition: width 0.4s ease-out;
         }
-        .progress-container.perfect-game .progress-bar-fill {
-            background: linear-gradient(90deg, #ffd700, #d4af37) !important;
-        }
-        .progress-container.perfect-game {
-            border-color: rgba(212, 175, 55, 0.4) !important;
-        }
+        .progress-container.perfect-game .progress-bar-fill { background: linear-gradient(90deg, #ffd700, #d4af37) !important; }
+        .progress-container.perfect-game { border-color: rgba(212, 175, 55, 0.4) !important; }
 
-        /* Фишка: Переключатели выбитых/закрытых ачивок */
         .achievements-filter-tabs {
             display: flex;
             gap: 6px;
@@ -444,9 +446,7 @@
             border: 1px solid rgba(48, 54, 61, 0.5);
             flex-shrink: 0;
         }
-        .icon-locked {
-            filter: grayscale(100%) opacity(35%);
-        }
+        .icon-locked { filter: grayscale(100%) opacity(35%); }
         .achievement-info {
             display: flex;
             flex-direction: column;
@@ -463,6 +463,14 @@
             color: #8b949e;
         }
 
+        /* Блок статуса и редкости */
+        .achievement-status-block {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
+        }
         .status-badge {
             display: flex;
             align-items: center;
@@ -483,7 +491,19 @@
             border: 1px solid rgba(48, 54, 61, 0.4);
         }
 
-        /* --- SKELETON LOADERS (МЯГКАЯ ЗАГРУЗКА) --- */
+        /* Текст редкости */
+        .rarity-text {
+            font-size: 10px;
+            color: #8b949e;
+            font-weight: 600;
+        }
+        /* Фишка: Неоновая фиолетовая подсветка для редких ачивок (<10% выбивших) */
+        .rarity-text.ultra-rare {
+            color: #d3bbff;
+            text-shadow: 0 0 6px rgba(187, 134, 252, 0.4);
+        }
+
+        /* --- SKELETON LOADERS --- */
         .skeleton-row {
             padding: 12px 6px;
             display: flex;
@@ -524,27 +544,16 @@
             border-radius: 6px;
             background: rgba(33, 38, 45, 0.6);
         }
-        .skeleton-shimmer {
-            position: relative;
-            overflow: hidden;
-        }
+        .skeleton-shimmer { position: relative; overflow: hidden; }
         .skeleton-shimmer::after {
             position: absolute;
             top: 0; right: 0; bottom: 0; left: 0;
             transform: translateX(-100%);
-            background-image: linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.04) 20%,
-                rgba(255, 255, 255, 0.08) 60%,
-                rgba(255, 255, 255, 0) 100%
-            );
+            background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.04) 20%, rgba(255, 255, 255, 0.08) 60%, rgba(255, 255, 255, 0) 100%);
             animation: shimmer 1.6s infinite;
             content: '';
         }
-        @keyframes shimmer {
-            100% { transform: translateX(100%); }
-        }
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
 
         .hidden { display: none !important; }
     </style>
@@ -566,7 +575,7 @@
                     <div class="platform-left">
                         <i class="fa-brands fa-steam platform-icon steam-icon"></i>
                         <div class="platform-meta">
-                            <span class="platform-name">Steam библиотека</span>
+                            <span class="platform-name">Steam</span>
                             <span class="platform-status"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Подключено</span>
                         </div>
                     </div>
@@ -589,7 +598,7 @@
             <div class="settings-box">
                 <div class="settings-item">
                     <span>Текущая версия трекера</span>
-                    <span style="color: #8b949e; font-weight: bold;">v2.1-skeleton</span>
+                    <span style="color: #8b949e; font-weight: bold;">v2.2-sort-rarity</span>
                 </div>
             </div>
         </div>
@@ -602,9 +611,7 @@
             </button>
 
             <header class="main-header">
-                <div class="main-title">
-                    <i class="fa-brands fa-steam"></i> Steam библиотека
-                </div>
+                <div class="main-title"><i class="fa-brands fa-steam"></i> Steam</div>
             </header>
 
             <div class="search-filter-container">
@@ -612,9 +619,19 @@
                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
                     <input type="text" id="search-input" class="search-input" placeholder="Поиск игры по названию..." oninput="renderGames()">
                 </div>
-                <div class="filter-tabs">
-                    <button id="tab-all" class="tab-btn active" onclick="setFilter('all')">Все игры</button>
-                    <button id="tab-fav" class="tab-btn" onclick="setFilter('fav')"><i class="fa-solid fa-heart"></i> Отслеживаемые</button>
+
+                <div class="controls-row">
+                    <div class="filter-tabs">
+                        <button id="tab-all" class="tab-btn active" onclick="setFilter('all')">Все</button>
+                        <button id="tab-fav" class="tab-btn" onclick="setFilter('fav')"><i class="fa-solid fa-heart"></i> Избранное</button>
+                    </div>
+
+                    <select id="sort-select" class="sort-select" onchange="renderGames()">
+                        <option value="name_asc">Алфавит: А-Я ↑</option>
+                        <option value="name_desc">Алфавит: Я-А ↓</option>
+                        <option value="prog_desc">Выполнение: 100%-0% ↓</option>
+                        <option value="prog_asc">Выполнение: 0%-100% ↑</option>
+                    </select>
                 </div>
             </div>
 
@@ -658,16 +675,17 @@
 
         let allGames = [];
         let currentFilter = 'all';
-        let currentAchFilter = 'all'; // Хранит состояние фильтра ачивок
-        let loadedAchievements = [];  // Кэш текущих загруженных ачивок для мгновенного переключения табов
+        let currentAchFilter = 'all';
+        let loadedAchievements = [];
         const perfectGamesCache = {};
+        // Кэш для хранения вычисленных процентов прохождения каждой игры, чтобы быстро сортировать
+        const gameProgressCache = {};
 
         let savedScrollPosition = 0;
         let isGamesLoadedOnce = false;
 
         document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
 
-        // Функция генерации Скелетонов для Игр
         function createGameSkeletons() {
             const container = document.getElementById('games-container');
             container.innerHTML = '';
@@ -684,7 +702,6 @@
             }
         }
 
-        // Функция генерации Скелетонов для Ачивок
         function createAchievementSkeletons() {
             const container = document.getElementById('achievements-container');
             container.innerHTML = '';
@@ -702,7 +719,7 @@
         }
 
         async function loadGames() {
-            createGameSkeletons(); // Включаем скелетоны перед запросом
+            createGameSkeletons();
             try {
                 const response = await fetch(`${BACKEND_URL}/api/games`);
                 const data = await response.json();
@@ -724,10 +741,26 @@
             const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
             const favorites = JSON.parse(localStorage.getItem('steam_favorites') || '[]');
 
-            const filteredGames = allGames.filter(game => {
+            // 1. Фильтрация
+            let filteredGames = allGames.filter(game => {
                 const matchesSearch = game.name.toLowerCase().includes(searchQuery);
                 const matchesFilter = currentFilter === 'all' || favorites.includes(game.appid);
                 return matchesSearch && matchesFilter;
+            });
+
+            // 2. Умная сортировка на основе выбранного правила
+            const sortRule = document.getElementById('sort-select').value;
+            filteredGames.sort((a, b) => {
+                if (sortRule === 'name_asc') return a.name.localeCompare(b.name);
+                if (sortRule === 'name_desc') return b.name.localeCompare(a.name);
+
+                // Сортировка по проценту прохождения
+                if (sortRule === 'prog_desc' || sortRule === 'prog_asc') {
+                    const progA = gameProgressCache[a.appid] || 0;
+                    const progB = gameProgressCache[b.appid] || 0;
+                    return sortRule === 'prog_desc' ? progB - progA : progA - progB;
+                }
+                return 0;
             });
 
             if (filteredGames.length === 0) {
@@ -737,7 +770,6 @@
 
             filteredGames.forEach(game => {
                 const row = document.createElement('div');
-                // Фишка: Вешаем класс золотого свечения, если игра пройдена на 100%
                 const isPerfect = perfectGamesCache[game.appid] === true;
                 row.className = `game-row ${isPerfect ? 'perfect-glow' : ''}`;
                 row.id = `game-row-${game.appid}`;
@@ -796,11 +828,13 @@
                 if (data.achievements && data.achievements.length > 0) {
                     const total = data.achievements.length;
                     const unlocked = data.achievements.filter(ach => ach.achieved === 1).length;
+                    const percent = Math.round((unlocked / total) * 100);
+
+                    // Сохраняем в кэш для сортировки
+                    gameProgressCache[gameId] = percent;
 
                     if (total === unlocked && total > 0) {
                         perfectGamesCache[gameId] = true;
-
-                        // Добавляем золото на лету, если карточка уже отрендерилась
                         const badge = document.getElementById(`badge-${gameId}`);
                         if (badge) badge.classList.remove('hidden');
                         const row = document.getElementById(`game-row-${gameId}`);
@@ -810,9 +844,11 @@
                     }
                 } else {
                     perfectGamesCache[gameId] = false;
+                    gameProgressCache[gameId] = 0;
                 }
             } catch(e) {
                 perfectGamesCache[gameId] = false;
+                gameProgressCache[gameId] = 0;
             }
         }
 
@@ -823,8 +859,6 @@
             document.getElementById('achievements-view').classList.remove('hidden');
 
             window.scrollTo(0, 0);
-
-            // Сбрасываем фильтр ачивок на "Все" при открытии новой игры
             setAchievementFilter('all');
 
             const titleElement = document.getElementById('selected-game-title');
@@ -833,7 +867,7 @@
             const imgUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${gameId}/header.jpg`;
             document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${imgUrl}')`;
 
-            createAchievementSkeletons(); // Включаем скелетоны ачивок
+            createAchievementSkeletons();
 
             const progressBlock = document.getElementById('progress-block');
             progressBlock.classList.remove('perfect-game');
@@ -848,7 +882,6 @@
                     return;
                 }
 
-                // Кэшируем ачивки в глобальную переменную и сортируем (сначала закрытые, потом открытые)
                 loadedAchievements = data.achievements.sort((a, b) => a.achieved - b.achieved);
 
                 const total = loadedAchievements.length;
@@ -864,7 +897,7 @@
                     titleElement.innerHTML = `<i class="fa-solid fa-crown perfect-crown-icon"></i> ${gameName}`;
                 }
 
-                renderAchievements(); // Отрисовываем отфильтрованный список
+                renderAchievements();
 
             } catch (error) {
                 console.error(error);
@@ -872,7 +905,6 @@
             }
         }
 
-        // Новая функция: Отрисовка ачивок с учётом выбранного таба (Все / Открытые / Закрытые)
         function renderAchievements() {
             const container = document.getElementById('achievements-container');
             container.innerHTML = '';
@@ -880,7 +912,7 @@
             const filtered = loadedAchievements.filter(ach => {
                 if (currentAchFilter === 'unlocked') return ach.achieved === 1;
                 if (currentAchFilter === 'locked') return ach.achieved === 0;
-                return true; // 'all'
+                return true;
             });
 
             if (filtered.length === 0) {
@@ -899,26 +931,31 @@
                 const descText = ach.description ? ach.description : 'Секретное достижение';
                 const iconUrl = ach.icon_url ? ach.icon_url : 'https://community.cloudflare.steamstatic.com/public/images/apps/570/6ee3ec3bc938be94f489f00d8329606d860d70eb.jpg';
 
+                // Вычисляем редкость
+                const globPercent = ach.global_percent !== undefined ? ach.global_percent : 100;
+                const isUltraRare = globPercent < 10.0;
+
                 item.innerHTML = `
                     <img class="${iconClass}" src="${iconUrl}" alt="icon" onerror="this.src='${DEFAULT_BG}'">
                     <div class="achievement-info">
                         <div class="achievement-name">${ach.name}</div>
                         <div class="achievement-desc">${descText}</div>
                     </div>
-                    <span class="status-badge ${badgeClass}">${badgeText}</span>
+                    <div class="achievement-status-block">
+                        <span class="status-badge ${badgeClass}">${badgeText}</span>
+                        <span class="rarity-text ${isUltraRare ? 'ultra-rare' : ''}">${globPercent}% игроков</span>
+                    </div>
                 `;
                 container.appendChild(item);
             });
         }
 
-        // Переключение фильтра ачивок
         function setAchievementFilter(type) {
             currentAchFilter = type;
             document.getElementById('ach-tab-all').classList.toggle('active', type === 'all');
             document.getElementById('ach-tab-unlocked').classList.toggle('active', type === 'unlocked');
             document.getElementById('ach-tab-locked').classList.toggle('active', type === 'locked');
 
-            // Запускаем перерисовку, только если данные уже загружены
             if (loadedAchievements.length > 0) {
                 renderAchievements();
             }

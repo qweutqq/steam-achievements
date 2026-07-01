@@ -221,15 +221,19 @@
         }
 
         /* Сортировка и вкладки в один ряд */
+        /* Оптимизированный контейнер для фильтров и сортировки */
         .controls-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            gap: 8px; /* Уменьшили зазор */
+            width: 100%;
+            box-sizing: border-box;
         }
         .filter-tabs {
             display: flex;
-            gap: 6px;
+            gap: 4px; /* Компактный зазор между вкладками */
+            flex-shrink: 0; /* Не дает вкладкам сжиматься до нечитаемости */
         }
         .tab-btn {
             background: rgba(33, 38, 45, 0.4);
@@ -237,15 +241,16 @@
             -webkit-backdrop-filter: blur(5px);
             border: 1px solid rgba(48, 54, 61, 0.6);
             color: #8b949e;
-            padding: 8px 14px;
+            padding: 6px 10px; /* Уменьшили внутренние отступы */
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px; /* Чуть уменьшили шрифт */
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+            white-space: nowrap; /* Запрещаем перенос текста */
         }
         .tab-btn.active {
             background: rgba(88, 166, 255, 0.15);
@@ -253,17 +258,20 @@
             color: #58a6ff;
         }
 
-        /* Селектор сортировки */
+        /* Селектор сортировки, который автоматически занимает оставшееся место */
         .sort-select {
+            flex-grow: 1; /* Занимает всё свободное пространство справа */
+            min-width: 0; /* Позволяет flex-элементу корректно сужаться */
             background: rgba(33, 38, 45, 0.6);
             border: 1px solid rgba(48, 54, 61, 0.8);
             color: #f0f6fc;
-            padding: 8px 10px;
+            padding: 6px 8px; /* Уменьшили отступы */
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px; /* Шрифт под стать кнопкам */
             font-weight: 600;
             outline: none;
             cursor: pointer;
+            text-overflow: ellipsis; /* Если текст не влезет, он аккуратно сократится с "..." */
         }
 
         /* СПИСОК ИГР */

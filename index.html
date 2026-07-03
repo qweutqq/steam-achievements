@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Platform Achievement Tracker</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* БАЗОВЫЙ СКВОЗНОЙ СТИЛЬ */
@@ -159,6 +160,9 @@
             border: 1px solid rgba(48, 54, 61, 0.4);
             border-radius: 12px;
             padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         .settings-item {
             display: flex;
@@ -166,6 +170,12 @@
             justify-content: space-between;
             font-size: 14px;
             color: #c9d1d9;
+        }
+        .settings-link {
+            color: #58a6ff;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
         }
 
         /* --- I. ЭКРАН ИГР СТИМА --- */
@@ -221,19 +231,18 @@
         }
 
         /* Сортировка и вкладки в один ряд */
-        /* Оптимизированный контейнер для фильтров и сортировки */
         .controls-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 8px; /* Уменьшили зазор */
+            gap: 8px;
             width: 100%;
             box-sizing: border-box;
         }
         .filter-tabs {
             display: flex;
-            gap: 4px; /* Компактный зазор между вкладками */
-            flex-shrink: 0; /* Не дает вкладкам сжиматься до нечитаемости */
+            gap: 4px;
+            flex-shrink: 0;
         }
         .tab-btn {
             background: rgba(33, 38, 45, 0.4);
@@ -241,16 +250,16 @@
             -webkit-backdrop-filter: blur(5px);
             border: 1px solid rgba(48, 54, 61, 0.6);
             color: #8b949e;
-            padding: 6px 10px; /* Уменьшили внутренние отступы */
+            padding: 6px 10px;
             border-radius: 8px;
-            font-size: 12px; /* Чуть уменьшили шрифт */
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 4px;
-            white-space: nowrap; /* Запрещаем перенос текста */
+            white-space: nowrap;
         }
         .tab-btn.active {
             background: rgba(88, 166, 255, 0.15);
@@ -258,20 +267,19 @@
             color: #58a6ff;
         }
 
-        /* Селектор сортировки, который автоматически занимает оставшееся место */
         .sort-select {
-            flex-grow: 1; /* Занимает всё свободное пространство справа */
-            min-width: 0; /* Позволяет flex-элементу корректно сужаться */
+            flex-grow: 1;
+            min-width: 0;
             background: rgba(33, 38, 45, 0.6);
             border: 1px solid rgba(48, 54, 61, 0.8);
             color: #f0f6fc;
-            padding: 6px 8px; /* Уменьшили отступы */
+            padding: 6px 8px;
             border-radius: 8px;
-            font-size: 12px; /* Шрифт под стать кнопкам */
+            font-size: 12px;
             font-weight: 600;
             outline: none;
             cursor: pointer;
-            text-overflow: ellipsis; /* Если текст не влезет, он аккуратно сократится с "..." */
+            text-overflow: ellipsis;
         }
 
         /* СПИСОК ИГР */
@@ -505,7 +513,6 @@
             color: #8b949e;
             font-weight: 600;
         }
-        /* Фишка: Неоновая фиолетовая подсветка для редких ачивок (<10% выбивших) */
         .rarity-text.ultra-rare {
             color: #d3bbff;
             text-shadow: 0 0 6px rgba(187, 134, 252, 0.4);
@@ -563,6 +570,43 @@
         }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
 
+        /* --- ЭКРАН ВХОДА ЧЕРЕЗ STEAM --- */
+        .auth-screen {
+            text-align: center;
+            margin-top: 70px;
+        }
+        .auth-icon {
+            font-size: 52px;
+            color: #66c0f4;
+            margin-bottom: 20px;
+        }
+        .auth-title {
+            color: #f0f6fc;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .auth-text {
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .auth-btn {
+            background: linear-gradient(90deg, #1b2838, #2a475e);
+            border: 1px solid #66c0f4;
+            color: #f0f6fc;
+            padding: 12px 26px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .auth-btn:hover { opacity: 0.9; }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -570,7 +614,23 @@
 
     <div id="global-dynamic-bg" class="global-bg"></div>
 
-    <div id="main-dashboard">
+    <div id="steam-login-view" class="hidden">
+        <div class="content-wrapper">
+            <div class="auth-screen">
+                <i class="fa-brands fa-steam auth-icon"></i>
+                <div class="auth-title">Подключи свой Steam-аккаунт</div>
+                <div id="steam-login-text" class="auth-text">
+                    Чтобы видеть свою библиотеку игр и достижения,<br>войди через Steam.
+                    Профиль должен быть публичным (Приватность → «Игровые детали»).
+                </div>
+                <button id="steam-login-btn" class="auth-btn" onclick="startSteamLogin()">
+                    <i class="fa-brands fa-steam"></i> Войти через Steam
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-dashboard" class="hidden">
         <div class="content-wrapper">
             <header class="dashboard-header">
                 <div class="dashboard-title">Trophy Hub</div>
@@ -606,7 +666,11 @@
             <div class="settings-box">
                 <div class="settings-item">
                     <span>Текущая версия трекера</span>
-                    <span style="color: #8b949e; font-weight: bold;">v2.2-sort-rarity</span>
+                    <span style="color: #8b949e; font-weight: bold;">v3.0-steam-login</span>
+                </div>
+                <div class="settings-item">
+                    <span>Steam-аккаунт: <span id="linked-steam-id" style="color:#7ee787;"></span></span>
+                    <span class="settings-link" onclick="startSteamLogin()">Сменить</span>
                 </div>
             </div>
         </div>
@@ -686,13 +750,75 @@
         let currentAchFilter = 'all';
         let loadedAchievements = [];
         const perfectGamesCache = {};
-        // Кэш для хранения вычисленных процентов прохождения каждой игры, чтобы быстро сортировать
         const gameProgressCache = {};
 
         let savedScrollPosition = 0;
         let isGamesLoadedOnce = false;
 
+        // Данные Telegram Mini App
+        let TG_INIT_DATA = '';
+
         document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
+
+        // Собирает URL к бэкенду и всегда добавляет initData для идентификации пользователя
+        function apiUrl(path, extraParams = {}) {
+            const url = new URL(BACKEND_URL + path);
+            url.searchParams.set('initData', TG_INIT_DATA);
+            Object.entries(extraParams).forEach(([k, v]) => url.searchParams.set(k, v));
+            return url.toString();
+        }
+
+        async function initApp() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                TG_INIT_DATA = Telegram.WebApp.initData || '';
+            }
+
+            if (!TG_INIT_DATA) {
+                showSteamLoginScreen('Открой Trophy Hub через кнопку в Telegram-боте, а не напрямую в браузере.', true);
+                return;
+            }
+
+            try {
+                const resp = await fetch(apiUrl('/api/me'));
+                const data = await resp.json();
+
+                if (data.error) {
+                    showSteamLoginScreen('Не удалось подтвердить пользователя Telegram. Открой мини-апп заново.', true);
+                    return;
+                }
+
+                if (!data.linked) {
+                    showSteamLoginScreen();
+                } else {
+                    document.getElementById('linked-steam-id').innerText = data.steam_id;
+                    document.getElementById('steam-login-view').classList.add('hidden');
+                    document.getElementById('main-dashboard').classList.remove('hidden');
+                }
+            } catch (e) {
+                showSteamLoginScreen('Нет соединения с сервером. Попробуй позже.', true);
+            }
+        }
+
+        function showSteamLoginScreen(message, hideButton) {
+            document.getElementById('main-dashboard').classList.add('hidden');
+            document.getElementById('steam-login-view').classList.remove('hidden');
+            if (message) {
+                document.getElementById('steam-login-text').innerText = message;
+            }
+            document.getElementById('steam-login-btn').classList.toggle('hidden', !!hideButton);
+        }
+
+        function startSteamLogin() {
+            if (!TG_INIT_DATA) return;
+            const loginUrl = `${BACKEND_URL}/auth/steam/login?initData=${encodeURIComponent(TG_INIT_DATA)}`;
+            if (window.Telegram && window.Telegram.WebApp) {
+                Telegram.WebApp.openLink(loginUrl);
+            } else {
+                window.open(loginUrl, '_blank');
+            }
+        }
 
         function createGameSkeletons() {
             const container = document.getElementById('games-container');
@@ -729,7 +855,7 @@
         async function loadGames() {
             createGameSkeletons();
             try {
-                const response = await fetch(`${BACKEND_URL}/api/games`);
+                const response = await fetch(apiUrl('/api/games'));
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
 
@@ -749,20 +875,17 @@
             const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
             const favorites = JSON.parse(localStorage.getItem('steam_favorites') || '[]');
 
-            // 1. Фильтрация
             let filteredGames = allGames.filter(game => {
                 const matchesSearch = game.name.toLowerCase().includes(searchQuery);
                 const matchesFilter = currentFilter === 'all' || favorites.includes(game.appid);
                 return matchesSearch && matchesFilter;
             });
 
-            // 2. Умная сортировка на основе выбранного правила
             const sortRule = document.getElementById('sort-select').value;
             filteredGames.sort((a, b) => {
                 if (sortRule === 'name_asc') return a.name.localeCompare(b.name);
                 if (sortRule === 'name_desc') return b.name.localeCompare(a.name);
 
-                // Сортировка по проценту прохождения
                 if (sortRule === 'prog_desc' || sortRule === 'prog_asc') {
                     const progA = gameProgressCache[a.appid] || 0;
                     const progB = gameProgressCache[b.appid] || 0;
@@ -831,14 +954,13 @@
 
         async function checkGamePerfectStatus(gameId) {
             try {
-                const response = await fetch(`${BACKEND_URL}/api/achievements?game_id=${gameId}`);
+                const response = await fetch(apiUrl('/api/achievements', { game_id: gameId }));
                 const data = await response.json();
                 if (data.achievements && data.achievements.length > 0) {
                     const total = data.achievements.length;
                     const unlocked = data.achievements.filter(ach => ach.achieved === 1).length;
                     const percent = Math.round((unlocked / total) * 100);
 
-                    // Сохраняем в кэш для сортировки
                     gameProgressCache[gameId] = percent;
 
                     if (total === unlocked && total > 0) {
@@ -882,7 +1004,7 @@
             document.getElementById('progress-bar-fill').style.width = '0%';
 
             try {
-                const response = await fetch(`${BACKEND_URL}/api/achievements?game_id=${gameId}`);
+                const response = await fetch(apiUrl('/api/achievements', { game_id: gameId }));
                 const data = await response.json();
 
                 if (data.error || !data.achievements || data.achievements.length === 0) {
@@ -939,7 +1061,6 @@
                 const descText = ach.description ? ach.description : 'Секретное достижение';
                 const iconUrl = ach.icon_url ? ach.icon_url : 'https://community.cloudflare.steamstatic.com/public/images/apps/570/6ee3ec3bc938be94f489f00d8329606d860d70eb.jpg';
 
-                // Вычисляем редкость
                 const globPercent = ach.global_percent !== undefined ? ach.global_percent : 100;
                 const isUltraRare = globPercent < 10.0;
 
@@ -997,6 +1118,9 @@
             document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
             window.scrollTo(0, 0);
         }
+
+        // Точка входа: сперва проверяем Telegram initData и привязку Steam
+        initApp();
     </script>
 </body>
 </html>

@@ -1159,7 +1159,7 @@
 
             // Формируем официальный OpenID 2.0 запрос напрямую к Steam
             const callbackUrl = `${BACKEND_URL}/api/auth/steam/callback?tg_id=${encodeURIComponent(tgId)}&client_id=${encodeURIComponent(clientId)}`;
-            const realmUrl = `${BACKEND_URL}/`;
+            const realmUrl = BACKEND_URL.replace(/\/+$/, '');
             const openidParams = new URLSearchParams({
                 'openid.ns': 'http://specs.openid.net/auth/2.0',
                 'openid.mode': 'checkid_setup',

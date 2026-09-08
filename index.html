@@ -712,6 +712,72 @@
             line-height: 1.4;
             margin-bottom: 16px;
         }
+        .steam-openid-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #171a21 0%, #1b2838 50%, #2a475e 100%);
+            border: 1px solid rgba(102, 192, 244, 0.45);
+            border-radius: 10px;
+            color: #ffffff;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            margin-bottom: 12px;
+        }
+        .steam-openid-btn:hover {
+            background: linear-gradient(135deg, #1b2838 0%, #2a475e 50%, #316282 100%);
+            border-color: #66c0f4;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(102, 192, 244, 0.25);
+        }
+        .steam-openid-btn:active {
+            transform: translateY(1px);
+        }
+        .openid-steam-icon {
+            font-size: 26px;
+            color: #66c0f4;
+            flex-shrink: 0;
+        }
+        .openid-btn-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .openid-title {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+        }
+        .openid-subtitle {
+            font-size: 11px;
+            color: #8b949e;
+            margin-top: 2px;
+        }
+        .modal-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 14px 0 12px;
+            color: #8b949e;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .modal-divider::before,
+        .modal-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .modal-divider span {
+            padding: 0 10px;
+        }
+
         .modal-submit-btn {
             width: 100%;
             background: linear-gradient(135deg, #238636, #2ea043);
@@ -778,8 +844,21 @@
                 <button class="modal-close-btn" onclick="closeSteamModal()" title="Закрыть"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
+                <!-- Официальная авторизация Steam OpenID в 1 клик -->
+                <button class="steam-openid-btn" id="btn-steam-openid" onclick="loginWithSteam()">
+                    <i class="fa-brands fa-steam openid-steam-icon"></i>
+                    <div class="openid-btn-text">
+                        <span class="openid-title">Войти через STEAM</span>
+                        <span class="openid-subtitle">Официальное окно входа Valve в 1 клик</span>
+                    </div>
+                </button>
+
+                <div class="modal-divider">
+                    <span>или вручную</span>
+                </div>
+
                 <p class="modal-desc">
-                    Введи ссылку на профиль Steam, кастомный никнейм, SteamID64 или код друга:
+                    Введи ссылку на профиль Steam, кастомный никнейм или код друга:
                 </p>
                 <div class="modal-input-wrapper">
                     <i class="fa-brands fa-steam modal-input-icon"></i>
@@ -788,16 +867,15 @@
                 <div id="modal-error-message" class="modal-error hidden"></div>
                 <div class="modal-examples">
                     <span class="modal-examples-title">Примеры ввода (нажми, чтобы подставить):</span>
-                    <div class="example-item" onclick="fillSteamExample('https://steamcommunity.com/profiles/76561198000000000')">• Ссылка: <code>steamcommunity.com/profiles/765611...</code></div>
                     <div class="example-item" onclick="fillSteamExample('https://steamcommunity.com/id/your_nickname')">• Ссылка: <code>steamcommunity.com/id/твой_ник</code></div>
-                    <div class="example-item" onclick="fillSteamExample('76561198000000000')">• ID: <code>76561198000000000</code> или код друга (например <code>12345678</code>)</div>
+                    <div class="example-item" onclick="fillSteamExample('12345678')">• Код друга: <code>12345678</code></div>
                 </div>
                 <div class="modal-privacy-hint">
                     <i class="fa-solid fa-circle-info" style="color: #58a6ff; margin-top: 2px;"></i>
                     <span>Убедись, что в Steam в <b>Редактировать профиль → Приватность</b> доступ к профилю и играм установлен в режим <b>Открытый</b>.</span>
                 </div>
                 <button id="btn-submit-steam" class="modal-submit-btn" onclick="submitSteamLink()">
-                    <span id="btn-submit-text">Подключить Steam</span>
+                    <span id="btn-submit-text">Подключить по ссылке/коду</span>
                 </button>
             </div>
         </div>
@@ -925,7 +1003,7 @@
         }
         const initData = tg?.initData || '';
         const urlParams = new URLSearchParams(window.location.search);
-        const queryTgId = urlParams.get('tg_id');
+        const queryTgId = urlParams.get('tg_id') || (tg?.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : null);
 
         let currentUser = null;
         let isSteamLinked = false;
@@ -1039,9 +1117,26 @@
             if (modal) modal.classList.remove('hidden');
         }
 
+        let authPollInterval = null;
+
+        function resetOpenIdBtn() {
+            const openidBtn = document.getElementById('btn-steam-openid');
+            if (openidBtn) {
+                openidBtn.innerHTML = `
+                    <i class="fa-brands fa-steam openid-steam-icon"></i>
+                    <div class="openid-btn-text">
+                        <span class="openid-title">Войти через STEAM</span>
+                        <span class="openid-subtitle">Официальное окно входа Valve в 1 клик</span>
+                    </div>
+                `;
+                openidBtn.disabled = false;
+            }
+        }
+
         function closeSteamModal() {
             const modal = document.getElementById('steam-modal-overlay');
             if (modal) modal.classList.add('hidden');
+            resetOpenIdBtn();
         }
 
         function handleModalOverlayClick(e) {
@@ -1058,6 +1153,57 @@
             }
         }
 
+        function loginWithSteam() {
+            const tgId = (currentUser && currentUser.tg_id) || queryTgId || '';
+            const clientId = getClientId();
+            const authUrl = getApiUrl('/api/auth/steam/login', { tg_id: tgId, client_id: clientId });
+
+            const openidBtn = document.getElementById('btn-steam-openid');
+            if (openidBtn) {
+                openidBtn.innerHTML = `
+                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 22px; color: #66c0f4; flex-shrink: 0;"></i>
+                    <div class="openid-btn-text">
+                        <span class="openid-title">Ожидание входа в Steam...</span>
+                        <span class="openid-subtitle">Авторизуйся в открывшемся окне</span>
+                    </div>
+                `;
+                openidBtn.disabled = true;
+            }
+
+            // Если открыто в Telegram WebApp
+            if (tg && typeof tg.openLink === 'function') {
+                tg.openLink(authUrl);
+            } else {
+                window.location.href = authUrl;
+                return;
+            }
+
+            // Фоновый поллинг статуса в Telegram WebApp
+            if (authPollInterval) clearInterval(authPollInterval);
+            authPollInterval = setInterval(async () => {
+                try {
+                    await checkUserStatus();
+                    if (isSteamLinked) {
+                        clearInterval(authPollInterval);
+                        authPollInterval = null;
+                        closeSteamModal();
+                        showGamesView();
+                    }
+                } catch (e) {
+                    console.warn("Ошибка проверки статуса:", e);
+                }
+            }, 2500);
+
+            // Таймаут сброса через 3 минуты
+            setTimeout(() => {
+                if (authPollInterval) {
+                    clearInterval(authPollInterval);
+                    authPollInterval = null;
+                    resetOpenIdBtn();
+                }
+            }, 180000);
+        }
+
         async function submitSteamLink() {
             const inputEl = document.getElementById('steam-link-input');
             const errorEl = document.getElementById('modal-error-message');
@@ -1067,7 +1213,7 @@
             const val = inputEl ? inputEl.value.trim() : '';
             if (!val) {
                 if (errorEl) {
-                    errorEl.innerText = "Пожалуйста, введи ссылку на профиль, никнейм или SteamID.";
+                    errorEl.innerText = "Пожалуйста, введи ссылку на профиль, никнейм или код друга.";
                     errorEl.classList.remove('hidden');
                 }
                 return;
@@ -1166,7 +1312,17 @@
             }
         }
 
-        checkUserStatus();
+        const isAuthSuccess = urlParams.get('auth_success') === '1';
+        if (isAuthSuccess) {
+            const cleanUrl = window.location.pathname + (queryTgId ? `?tg_id=${queryTgId}` : '');
+            window.history.replaceState({}, document.title, cleanUrl);
+        }
+
+        checkUserStatus().then(() => {
+            if (isAuthSuccess && isSteamLinked) {
+                showGamesView();
+            }
+        });
 
         function createGameSkeletons() {
             const container = document.getElementById('games-container');

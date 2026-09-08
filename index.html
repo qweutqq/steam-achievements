@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Platform Achievement Tracker</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* БАЗОВЫЙ СКВОЗНОЙ СТИЛЬ */
@@ -579,12 +580,12 @@
 
             <div class="section-title">Игровые Платформы</div>
             <div class="platform-list">
-                <div class="platform-card steam-card" onclick="showGamesView()">
+                <div class="platform-card steam-card" id="steam-platform-card" onclick="handleSteamClick()">
                     <div class="platform-left">
                         <i class="fa-brands fa-steam platform-icon steam-icon"></i>
                         <div class="platform-meta">
-                            <span class="platform-name">Steam</span>
-                            <span class="platform-status"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Подключено</span>
+                            <span class="platform-name" id="steam-card-name">Steam</span>
+                            <span class="platform-status" id="steam-card-status"><i class="fa-solid fa-circle-notch fa-spin" style="font-size: 10px;"></i> Подключение...</span>
                         </div>
                     </div>
                     <i class="fa-solid fa-chevron-right" style="color: #8b949e; font-size: 14px;"></i>
@@ -595,7 +596,7 @@
                         <i class="fa-brands fa-playstation platform-icon ps-icon"></i>
                         <div class="platform-meta">
                             <span class="platform-name">PlayStation Network</span>
-                            <span class="platform-status">Не подключено</span>
+                            <span class="platform-status" id="psn-card-status">Не подключено</span>
                         </div>
                     </div>
                     <span class="coming-soon-badge">Скоро</span>
@@ -606,7 +607,7 @@
             <div class="settings-box">
                 <div class="settings-item">
                     <span>Текущая версия трекера</span>
-                    <span style="color: #8b949e; font-weight: bold;">v2.2-sort-rarity</span>
+                    <span style="color: #8b949e; font-weight: bold;">v2.3-multi-user</span>
                 </div>
             </div>
         </div>
@@ -619,7 +620,7 @@
             </button>
 
             <header class="main-header">
-                <div class="main-title"><i class="fa-brands fa-steam"></i> Steam</div>
+                <div class="main-title"><i class="fa-brands fa-steam"></i> Steam <span id="steam-user-badge" style="font-size: 13px; font-weight: normal; color: #8b949e; text-transform: none; margin-left: 6px;"></span></div>
             </header>
 
             <div class="search-filter-container">
@@ -678,8 +679,22 @@
     </div>
 
     <script>
-        const BACKEND_URL = 'https://steam-achievements-backend.onrender.com';
+        const BACKEND_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? 'http://localhost:8000'
+            : 'https://steam-achievements-backend.onrender.com';
         const DEFAULT_BG = "https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=1000&auto=format&fit=crop";
+
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+        const initData = tg?.initData || '';
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryTgId = urlParams.get('tg_id');
+
+        let currentUser = null;
+        let isSteamLinked = false;
 
         let allGames = [];
         let currentFilter = 'all';
@@ -693,6 +708,82 @@
         let isGamesLoadedOnce = false;
 
         document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
+
+        function getApiUrl(endpoint, params = {}) {
+            const url = new URL(`${BACKEND_URL}${endpoint}`);
+            if (initData) {
+                url.searchParams.set('initData', initData);
+            }
+            if (queryTgId) {
+                url.searchParams.set('tg_id', queryTgId);
+            }
+            for (const [key, val] of Object.entries(params)) {
+                if (val !== undefined && val !== null) {
+                    url.searchParams.set(key, val);
+                }
+            }
+            return url.toString();
+        }
+
+        async function checkUserStatus() {
+            try {
+                const res = await fetch(getApiUrl('/api/me'));
+                const data = await res.json();
+                if (data.user) {
+                    currentUser = data.user;
+                    isSteamLinked = Boolean(data.user.steam_id);
+                    updateDashboardUI(data.user);
+                } else {
+                    updateDashboardUI(null);
+                }
+            } catch (e) {
+                console.warn("Не удалось проверить статус пользователя:", e);
+                updateDashboardUI(null);
+            }
+        }
+
+        function updateDashboardUI(user) {
+            const steamStatus = document.getElementById('steam-card-status');
+            const steamBadge = document.getElementById('steam-user-badge');
+            if (!steamStatus) return;
+
+            if (user && user.steam_id) {
+                const personaname = user.steam_personaname || 'Подключено';
+                steamStatus.innerHTML = `<i class="fa-solid fa-circle" style="font-size: 8px; color: #7ee787;"></i> ${personaname}`;
+                steamStatus.style.color = '#7ee787';
+                if (steamBadge) steamBadge.innerText = `• ${personaname}`;
+            } else {
+                steamStatus.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="font-size: 10px; color: #f85149;"></i> Не подключено`;
+                steamStatus.style.color = '#f85149';
+                if (steamBadge) steamBadge.innerText = '';
+            }
+        }
+
+        function handleSteamClick() {
+            if (currentUser && !currentUser.steam_id) {
+                if (tg && tg.showPopup) {
+                    tg.showPopup({
+                        title: "Steam не привязан",
+                        message: "Пожалуйста, отправь боту ссылку на свой профиль Steam или никнейм, чтобы открыть библиотеку!",
+                        buttons: [{ type: "ok", text: "Понятно" }]
+                    });
+                } else {
+                    alert("Steam не привязан. Отправь боту ссылку на свой профиль Steam!");
+                }
+                return;
+            }
+            showGamesView();
+        }
+
+        function closeOrBackToBot() {
+            if (tg && tg.close) {
+                tg.close();
+            } else {
+                showDashboardView();
+            }
+        }
+
+        checkUserStatus();
 
         function createGameSkeletons() {
             const container = document.getElementById('games-container');
@@ -729,11 +820,43 @@
         async function loadGames() {
             createGameSkeletons();
             try {
-                const response = await fetch(`${BACKEND_URL}/api/games`);
+                const response = await fetch(getApiUrl('/api/games'));
                 const data = await response.json();
-                if (data.error) throw new Error(data.error);
+                if (data.error === 'not_linked') {
+                    document.getElementById('games-container').innerHTML = `
+                        <div style="text-align:center; padding: 40px 15px;">
+                            <i class="fa-brands fa-steam" style="font-size: 48px; color: #8b949e; margin-bottom: 16px;"></i>
+                            <h3 style="color:#f0f6fc; margin-bottom: 8px;">Steam-аккаунт не привязан</h3>
+                            <p style="color:#8b949e; font-size: 13px; line-height: 1.5; margin-bottom: 24px;">
+                                Чтобы получить доступ к своей библиотеке, отправь Telegram-боту ссылку на свой профиль Steam или свой никнейм.
+                            </p>
+                            <button class="back-btn" onclick="closeOrBackToBot()" style="margin: 0 auto; display: inline-flex;">
+                                <i class="fa-solid fa-arrow-left"></i> Вернуться в бота
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                if (data.error === 'privacy_restricted') {
+                    document.getElementById('games-container').innerHTML = `
+                        <div style="text-align:center; padding: 40px 15px;">
+                            <i class="fa-solid fa-lock" style="font-size: 42px; color: #e3b341; margin-bottom: 16px;"></i>
+                            <h3 style="color:#f0f6fc; margin-bottom: 8px;">Список игр скрыт</h3>
+                            <p style="color:#8b949e; font-size: 13px; line-height: 1.5;">
+                                В настройках приватности твоего профиля Steam список игр закрыт от посторонних.<br><br>
+                                Зайди в Steam → Редактировать профиль → Приватность → установи <b>'Доступ к играм: Открытый'</b>, а затем вернись сюда.
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+                if (data.error) throw new Error(data.message || data.error);
 
                 allGames = data.games || [];
+                if (data.user && data.user.steam_personaname) {
+                    const badge = document.getElementById('steam-user-badge');
+                    if (badge) badge.innerText = `• ${data.user.steam_personaname}`;
+                }
                 isGamesLoadedOnce = true;
                 renderGames();
             } catch (error) {
@@ -831,7 +954,7 @@
 
         async function checkGamePerfectStatus(gameId) {
             try {
-                const response = await fetch(`${BACKEND_URL}/api/achievements?game_id=${gameId}`);
+                const response = await fetch(getApiUrl('/api/achievements', { game_id: gameId }));
                 const data = await response.json();
                 if (data.achievements && data.achievements.length > 0) {
                     const total = data.achievements.length;
@@ -882,7 +1005,7 @@
             document.getElementById('progress-bar-fill').style.width = '0%';
 
             try {
-                const response = await fetch(`${BACKEND_URL}/api/achievements?game_id=${gameId}`);
+                const response = await fetch(getApiUrl('/api/achievements', { game_id: gameId }));
                 const data = await response.json();
 
                 if (data.error || !data.achievements || data.achievements.length === 0) {

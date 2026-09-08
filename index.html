@@ -760,15 +760,15 @@
         }
 
         function handleSteamClick() {
-            if (currentUser && !currentUser.steam_id) {
+            if (!isSteamLinked) {
                 if (tg && tg.showPopup) {
                     tg.showPopup({
-                        title: "Steam не привязан",
-                        message: "Пожалуйста, отправь боту ссылку на свой профиль Steam или никнейм, чтобы открыть библиотеку!",
+                        title: "Steam не подключён",
+                        message: "Сначала привяжи свой Steam-аккаунт в боте. Отправь боту ссылку на профиль Steam или никнейм.",
                         buttons: [{ type: "ok", text: "Понятно" }]
                     });
                 } else {
-                    alert("Steam не привязан. Отправь боту ссылку на свой профиль Steam!");
+                    alert("Steam не подключён. Отправь боту ссылку на профиль Steam или никнейм!");
                 }
                 return;
             }
@@ -818,6 +818,22 @@
         }
 
         async function loadGames() {
+            if (!isSteamLinked) {
+                document.getElementById('games-container').innerHTML = `
+                    <div style="text-align:center; padding: 40px 15px;">
+                        <i class="fa-brands fa-steam" style="font-size: 48px; color: #8b949e; margin-bottom: 16px;"></i>
+                        <h3 style="color:#f0f6fc; margin-bottom: 8px;">Steam-аккаунт не привязан</h3>
+                        <p style="color:#8b949e; font-size: 13px; line-height: 1.5; margin-bottom: 24px;">
+                            Чтобы получить доступ к своей библиотеке, отправь Telegram-боту ссылку на свой профиль Steam или свой никнейм.
+                        </p>
+                        <button class="back-btn" onclick="closeOrBackToBot()" style="margin: 0 auto; display: inline-flex;">
+                            <i class="fa-solid fa-arrow-left"></i> Вернуться в бота
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
             createGameSkeletons();
             try {
                 const response = await fetch(getApiUrl('/api/games'));

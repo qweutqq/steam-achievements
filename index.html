@@ -854,7 +854,7 @@
                 </button>
 
                 <div class="modal-divider">
-                    <span>или вручную</span>
+                    <span>или напрямую по коду / ссылке</span>
                 </div>
 
                 <p class="modal-desc">
@@ -1022,6 +1022,12 @@
         document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
 
         function getClientId() {
+            const params = new URLSearchParams(window.location.search);
+            const urlCid = params.get('client_id');
+            if (urlCid) {
+                localStorage.setItem('trophy_hub_client_id', urlCid);
+                return urlCid;
+            }
             let cid = localStorage.getItem('trophy_hub_client_id');
             if (!cid) {
                 cid = 'web_' + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);

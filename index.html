@@ -1156,7 +1156,19 @@
         function loginWithSteam() {
             const tgId = (currentUser && currentUser.tg_id) || queryTgId || '';
             const clientId = getClientId();
-            const authUrl = getApiUrl('/api/auth/steam/login', { tg_id: tgId, client_id: clientId });
+
+            // Формируем официальный OpenID 2.0 запрос напрямую к Steam
+            const callbackUrl = `${BACKEND_URL}/api/auth/steam/callback?tg_id=${encodeURIComponent(tgId)}&client_id=${encodeURIComponent(clientId)}`;
+            const realmUrl = `${BACKEND_URL}/`;
+            const openidParams = new URLSearchParams({
+                'openid.ns': 'http://specs.openid.net/auth/2.0',
+                'openid.mode': 'checkid_setup',
+                'openid.return_to': callbackUrl,
+                'openid.realm': realmUrl,
+                'openid.identity': 'http://specs.openid.net/auth/2.0/identifier_select',
+                'openid.claimed_id': 'http://specs.openid.net/auth/2.0/identifier_select'
+            });
+            const steamAuthUrl = `https://steamcommunity.com/openid/login?${openidParams.toString()}`;
 
             const openidBtn = document.getElementById('btn-steam-openid');
             if (openidBtn) {
@@ -1172,9 +1184,9 @@
 
             // Если открыто в Telegram WebApp
             if (tg && typeof tg.openLink === 'function') {
-                tg.openLink(authUrl);
+                tg.openLink(steamAuthUrl);
             } else {
-                window.location.href = authUrl;
+                window.location.href = steamAuthUrl;
                 return;
             }
 

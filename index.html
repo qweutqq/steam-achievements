@@ -564,12 +564,244 @@
         }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
 
+        /* --- STEAM LINK MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-card {
+            background: linear-gradient(160deg, #161b22, #0d1117);
+            border: 1px solid rgba(88, 166, 255, 0.35);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(102, 192, 244, 0.15);
+            border-radius: 16px;
+            max-width: 440px;
+            width: 100%;
+            padding: 22px;
+            box-sizing: border-box;
+            animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes popIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .modal-title {
+            color: #f0f6fc;
+            font-size: 17px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            color: #8b949e;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: color 0.15s, background-color 0.15s;
+        }
+        .modal-close-btn:hover {
+            color: #f0f6fc;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .modal-desc {
+            color: #8b949e;
+            font-size: 13px;
+            line-height: 1.45;
+            margin-bottom: 14px;
+        }
+        .modal-input-wrapper {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        .modal-input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #66c0f4;
+            font-size: 16px;
+        }
+        .modal-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 12px 12px 38px;
+            background: rgba(13, 17, 23, 0.9);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #f0f6fc;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .modal-input:focus {
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2);
+        }
+        .modal-error {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+            color: #f85149;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .modal-examples {
+            background: rgba(22, 27, 34, 0.6);
+            border: 1px solid rgba(48, 54, 61, 0.4);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            font-size: 11px;
+            color: #8b949e;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .modal-examples-title {
+            font-weight: 700;
+            color: #c9d1d9;
+            margin-bottom: 2px;
+        }
+        .example-item {
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+        .example-item:hover {
+            background: rgba(56, 139, 253, 0.15);
+        }
+        .example-item code {
+            color: #58a6ff;
+            font-family: inherit;
+        }
+        .modal-privacy-hint {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            background: rgba(56, 139, 253, 0.08);
+            border: 1px solid rgba(56, 139, 253, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 11px;
+            color: #8b949e;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+        .modal-submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .modal-submit-btn:hover { opacity: 0.92; }
+        .modal-submit-btn:active { transform: scale(0.98); }
+        .modal-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .connect-badge-btn {
+            background: rgba(56, 139, 253, 0.15);
+            border: 1px solid rgba(56, 139, 253, 0.4);
+            color: #58a6ff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .connect-badge-btn:hover {
+            background: rgba(56, 139, 253, 0.3);
+            border-color: #58a6ff;
+        }
+        .user-mini-avatar {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            object-fit: cover;
+            vertical-align: middle;
+            margin-right: 5px;
+            border: 1px solid rgba(126, 231, 135, 0.6);
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="global-dynamic-bg" class="global-bg"></div>
+
+    <!-- Модальное окно привязки Steam -->
+    <div id="steam-modal-overlay" class="modal-overlay hidden" onclick="handleModalOverlayClick(event)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fa-brands fa-steam" style="color: #66c0f4;"></i>
+                    <span>Подключение Steam</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeSteamModal()" title="Закрыть"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">
+                    Введи ссылку на профиль Steam, кастомный никнейм, SteamID64 или код друга:
+                </p>
+                <div class="modal-input-wrapper">
+                    <i class="fa-brands fa-steam modal-input-icon"></i>
+                    <input type="text" id="steam-link-input" class="modal-input" placeholder="https://steamcommunity.com/id/... или ник" autocomplete="off">
+                </div>
+                <div id="modal-error-message" class="modal-error hidden"></div>
+                <div class="modal-examples">
+                    <span class="modal-examples-title">Примеры ввода (нажми, чтобы подставить):</span>
+                    <div class="example-item" onclick="fillSteamExample('https://steamcommunity.com/profiles/76561198916762955')">• Ссылка: <code>steamcommunity.com/profiles/765611...</code></div>
+                    <div class="example-item" onclick="fillSteamExample('https://steamcommunity.com/id/твой_ник')">• Ссылка: <code>steamcommunity.com/id/твой_ник</code></div>
+                    <div class="example-item" onclick="fillSteamExample('76561198916762955')">• ID: <code>76561198916762955</code> или код друга (например <code>956497227</code>)</div>
+                </div>
+                <div class="modal-privacy-hint">
+                    <i class="fa-solid fa-circle-info" style="color: #58a6ff; margin-top: 2px;"></i>
+                    <span>Убедись, что в Steam в <b>Редактировать профиль → Приватность</b> доступ к профилю и играм установлен в режим <b>Открытый</b>.</span>
+                </div>
+                <button id="btn-submit-steam" class="modal-submit-btn" onclick="submitSteamLink()">
+                    <span id="btn-submit-text">Подключить Steam</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div id="main-dashboard">
         <div class="content-wrapper">
@@ -588,7 +820,9 @@
                             <span class="platform-status" id="steam-card-status"><i class="fa-solid fa-circle-notch fa-spin" style="font-size: 10px;"></i> Подключение...</span>
                         </div>
                     </div>
-                    <i class="fa-solid fa-chevron-right" style="color: #8b949e; font-size: 14px;"></i>
+                    <div id="steam-card-action" style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-chevron-right" style="color: #8b949e; font-size: 14px;"></i>
+                    </div>
                 </div>
 
                 <div class="platform-card disabled">
@@ -709,6 +943,15 @@
 
         document.getElementById('global-dynamic-bg').style.backgroundImage = `url('${DEFAULT_BG}')`;
 
+        function getClientId() {
+            let cid = localStorage.getItem('trophy_hub_client_id');
+            if (!cid) {
+                cid = 'web_' + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
+                localStorage.setItem('trophy_hub_client_id', cid);
+            }
+            return cid;
+        }
+
         function getApiUrl(endpoint, params = {}) {
             const url = new URL(`${BACKEND_URL}${endpoint}`);
             if (initData) {
@@ -717,6 +960,7 @@
             if (queryTgId) {
                 url.searchParams.set('tg_id', queryTgId);
             }
+            url.searchParams.set('client_id', getClientId());
             for (const [key, val] of Object.entries(params)) {
                 if (val !== undefined && val !== null) {
                     url.searchParams.set(key, val);
@@ -729,11 +973,13 @@
             try {
                 const res = await fetch(getApiUrl('/api/me'));
                 const data = await res.json();
-                if (data.user) {
+                if (data.user && data.linked) {
                     currentUser = data.user;
                     isSteamLinked = Boolean(data.user.steam_id);
                     updateDashboardUI(data.user);
                 } else {
+                    currentUser = data.user || null;
+                    isSteamLinked = false;
                     updateDashboardUI(null);
                 }
             } catch (e) {
@@ -745,35 +991,151 @@
         function updateDashboardUI(user) {
             const steamStatus = document.getElementById('steam-card-status');
             const steamBadge = document.getElementById('steam-user-badge');
+            const steamAction = document.getElementById('steam-card-action');
             if (!steamStatus) return;
 
             if (user && user.steam_id) {
                 const personaname = user.steam_personaname || 'Подключено';
-                steamStatus.innerHTML = `<i class="fa-solid fa-circle" style="font-size: 8px; color: #7ee787;"></i> ${personaname}`;
+                const avatarHtml = user.steam_avatar ? `<img src="${user.steam_avatar}" class="user-mini-avatar" alt="">` : '';
+                steamStatus.innerHTML = `${avatarHtml}<i class="fa-solid fa-circle" style="font-size: 8px; color: #7ee787;"></i> ${personaname}`;
                 steamStatus.style.color = '#7ee787';
                 if (steamBadge) steamBadge.innerText = `• ${personaname}`;
+                if (steamAction) {
+                    steamAction.innerHTML = `
+                        <button class="connect-badge-btn" onclick="openSteamModal(event)" title="Сменить Steam"><i class="fa-solid fa-arrows-rotate"></i> Сменить</button>
+                        <i class="fa-solid fa-chevron-right" style="color: #8b949e; font-size: 14px; margin-left: 6px;"></i>
+                    `;
+                }
             } else {
                 steamStatus.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="font-size: 10px; color: #f85149;"></i> Не подключено`;
                 steamStatus.style.color = '#f85149';
                 if (steamBadge) steamBadge.innerText = '';
+                if (steamAction) {
+                    steamAction.innerHTML = `
+                        <button class="connect-badge-btn" onclick="openSteamModal(event)"><i class="fa-solid fa-plus"></i> Подключить</button>
+                    `;
+                }
             }
         }
 
         function handleSteamClick() {
             if (!isSteamLinked) {
-                if (tg && tg.showPopup) {
-                    tg.showPopup({
-                        title: "Steam не подключён",
-                        message: "Сначала привяжи свой Steam-аккаунт в боте. Отправь боту ссылку на профиль Steam или никнейм.",
-                        buttons: [{ type: "ok", text: "Понятно" }]
-                    });
-                } else {
-                    alert("Steam не подключён. Отправь боту ссылку на профиль Steam или никнейм!");
-                }
+                openSteamModal();
                 return;
             }
             showGamesView();
         }
+
+        function openSteamModal(e) {
+            if (e) e.stopPropagation();
+            const modal = document.getElementById('steam-modal-overlay');
+            const errorEl = document.getElementById('modal-error-message');
+            const inputEl = document.getElementById('steam-link-input');
+            if (errorEl) errorEl.classList.add('hidden');
+            if (inputEl) {
+                inputEl.value = '';
+                setTimeout(() => inputEl.focus(), 120);
+            }
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeSteamModal() {
+            const modal = document.getElementById('steam-modal-overlay');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handleModalOverlayClick(e) {
+            if (e.target.id === 'steam-modal-overlay') {
+                closeSteamModal();
+            }
+        }
+
+        function fillSteamExample(val) {
+            const inputEl = document.getElementById('steam-link-input');
+            if (inputEl) {
+                inputEl.value = val;
+                inputEl.focus();
+            }
+        }
+
+        async function submitSteamLink() {
+            const inputEl = document.getElementById('steam-link-input');
+            const errorEl = document.getElementById('modal-error-message');
+            const submitBtn = document.getElementById('btn-submit-steam');
+            const submitText = document.getElementById('btn-submit-text');
+
+            const val = inputEl ? inputEl.value.trim() : '';
+            if (!val) {
+                if (errorEl) {
+                    errorEl.innerText = "Пожалуйста, введи ссылку на профиль, никнейм или SteamID.";
+                    errorEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (errorEl) errorEl.classList.add('hidden');
+            if (submitBtn) submitBtn.disabled = true;
+            if (submitText) submitText.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Подключаем...`;
+
+            try {
+                const res = await fetch(getApiUrl('/api/link_steam'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        steam_input: val,
+                        initData: initData,
+                        tg_id: queryTgId,
+                        client_id: getClientId()
+                    })
+                });
+                const data = await res.json();
+
+                if (data.error) {
+                    if (errorEl) {
+                        errorEl.innerText = data.message || "Не удалось привязать Steam. Проверь введенные данные.";
+                        errorEl.classList.remove('hidden');
+                    }
+                    if (submitBtn) submitBtn.disabled = false;
+                    if (submitText) submitText.innerText = "Подключить Steam";
+                    return;
+                }
+
+                if (data.success && data.user) {
+                    currentUser = data.user;
+                    isSteamLinked = true;
+                    isGamesLoadedOnce = false;
+                    updateDashboardUI(data.user);
+                    if (submitText) submitText.innerHTML = `<i class="fa-solid fa-check"></i> Успешно подключено!`;
+
+                    setTimeout(() => {
+                        closeSteamModal();
+                        if (submitBtn) submitBtn.disabled = false;
+                        if (submitText) submitText.innerText = "Подключить Steam";
+                        showGamesView();
+                    }, 500);
+                }
+            } catch (err) {
+                console.error("Ошибка привязки Steam:", err);
+                if (errorEl) {
+                    errorEl.innerText = "Ошибка соединения с сервером. Попробуй еще раз.";
+                    errorEl.classList.remove('hidden');
+                }
+                if (submitBtn) submitBtn.disabled = false;
+                if (submitText) submitText.innerText = "Подключить Steam";
+            }
+        }
+
+        // Поддержка нажатия Enter в поле ввода модального окна
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputEl = document.getElementById('steam-link-input');
+            if (inputEl) {
+                inputEl.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        submitSteamLink();
+                    }
+                });
+            }
+        });
 
         function closeOrBackToBot() {
             if (tg && tg.close) {
@@ -820,15 +1182,20 @@
         async function loadGames() {
             if (!isSteamLinked) {
                 document.getElementById('games-container').innerHTML = `
-                    <div style="text-align:center; padding: 40px 15px;">
-                        <i class="fa-brands fa-steam" style="font-size: 48px; color: #8b949e; margin-bottom: 16px;"></i>
+                    <div style="text-align:center; padding: 35px 20px; background: rgba(22, 27, 34, 0.4); border-radius: 12px; border: 1px solid rgba(48, 54, 61, 0.5); margin: 20px 0;">
+                        <i class="fa-brands fa-steam" style="font-size: 46px; color: #66c0f4; margin-bottom: 14px;"></i>
                         <h3 style="color:#f0f6fc; margin-bottom: 8px;">Steam-аккаунт не привязан</h3>
-                        <p style="color:#8b949e; font-size: 13px; line-height: 1.5; margin-bottom: 24px;">
-                            Чтобы получить доступ к своей библиотеке, отправь Telegram-боту ссылку на свой профиль Steam или свой никнейм.
+                        <p style="color:#8b949e; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">
+                            Чтобы просматривать свою библиотеку и достижения, подключи свой аккаунт Steam:
                         </p>
-                        <button class="back-btn" onclick="closeOrBackToBot()" style="margin: 0 auto; display: inline-flex;">
-                            <i class="fa-solid fa-arrow-left"></i> Вернуться в бота
+                        <button class="modal-submit-btn" onclick="openSteamModal()" style="max-width: 240px; margin: 0 auto 16px auto;">
+                            <i class="fa-solid fa-plus"></i> Подключить Steam
                         </button>
+                        <div>
+                            <button class="back-btn" onclick="showDashboardView()" style="margin: 0 auto; display: inline-flex;">
+                                <i class="fa-solid fa-arrow-left"></i> На главную
+                            </button>
+                        </div>
                     </div>
                 `;
                 return;
@@ -839,18 +1206,8 @@
                 const response = await fetch(getApiUrl('/api/games'));
                 const data = await response.json();
                 if (data.error === 'not_linked') {
-                    document.getElementById('games-container').innerHTML = `
-                        <div style="text-align:center; padding: 40px 15px;">
-                            <i class="fa-brands fa-steam" style="font-size: 48px; color: #8b949e; margin-bottom: 16px;"></i>
-                            <h3 style="color:#f0f6fc; margin-bottom: 8px;">Steam-аккаунт не привязан</h3>
-                            <p style="color:#8b949e; font-size: 13px; line-height: 1.5; margin-bottom: 24px;">
-                                Чтобы получить доступ к своей библиотеке, отправь Telegram-боту ссылку на свой профиль Steam или свой никнейм.
-                            </p>
-                            <button class="back-btn" onclick="closeOrBackToBot()" style="margin: 0 auto; display: inline-flex;">
-                                <i class="fa-solid fa-arrow-left"></i> Вернуться в бота
-                            </button>
-                        </div>
-                    `;
+                    isSteamLinked = false;
+                    loadGames();
                     return;
                 }
                 if (data.error === 'privacy_restricted') {

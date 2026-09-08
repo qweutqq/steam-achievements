@@ -788,9 +788,9 @@
                 <div id="modal-error-message" class="modal-error hidden"></div>
                 <div class="modal-examples">
                     <span class="modal-examples-title">Примеры ввода (нажми, чтобы подставить):</span>
-                    <div class="example-item" onclick="fillSteamExample('https://steamcommunity.com/profiles/76561198916762955')">• Ссылка: <code>steamcommunity.com/profiles/765611...</code></div>
-                    <div class="example-item" onclick="fillSteamExample('https://steamcommunity.com/id/твой_ник')">• Ссылка: <code>steamcommunity.com/id/твой_ник</code></div>
-                    <div class="example-item" onclick="fillSteamExample('76561198916762955')">• ID: <code>76561198916762955</code> или код друга (например <code>956497227</code>)</div>
+                    <div class="example-item" onclick="fillSteamExample('https://steamcommunity.com/profiles/76561198000000000')">• Ссылка: <code>steamcommunity.com/profiles/765611...</code></div>
+                    <div class="example-item" onclick="fillSteamExample('https://steamcommunity.com/id/your_nickname')">• Ссылка: <code>steamcommunity.com/id/твой_ник</code></div>
+                    <div class="example-item" onclick="fillSteamExample('76561198000000000')">• ID: <code>76561198000000000</code> или код друга (например <code>12345678</code>)</div>
                 </div>
                 <div class="modal-privacy-hint">
                     <i class="fa-solid fa-circle-info" style="color: #58a6ff; margin-top: 2px;"></i>
@@ -1077,10 +1077,14 @@
             if (submitBtn) submitBtn.disabled = true;
             if (submitText) submitText.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Подключаем...`;
 
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+
             try {
                 const res = await fetch(getApiUrl('/api/link_steam'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal,
                     body: JSON.stringify({
                         steam_input: val,
                         initData: initData,
@@ -1088,11 +1092,25 @@
                         client_id: getClientId()
                     })
                 });
-                const data = await res.json();
+                clearTimeout(timeoutId);
 
-                if (data.error) {
+                let data = null;
+                try {
+                    data = await res.json();
+                } catch (e) {}
+
+                if (!res.ok || !data || data.error || data.detail) {
+                    let errMsg = data?.message || data?.detail;
+                    if (res.status === 404) {
+                        errMsg = "Сервер Render сейчас обновляется на новую версию (код 404). Пожалуйста, подожди 1-2 минуты и попробуй снова.";
+                    } else if (res.status === 500) {
+                        errMsg = "Внутренняя ошибка сервера (500). Попробуй через минуту.";
+                    } else if (!errMsg) {
+                        errMsg = "Не удалось привязать Steam. Проверь правильность ввода.";
+                    }
+
                     if (errorEl) {
-                        errorEl.innerText = data.message || "Не удалось привязать Steam. Проверь введенные данные.";
+                        errorEl.innerText = errMsg;
                         errorEl.classList.remove('hidden');
                     }
                     if (submitBtn) submitBtn.disabled = false;
@@ -1117,7 +1135,10 @@
             } catch (err) {
                 console.error("Ошибка привязки Steam:", err);
                 if (errorEl) {
-                    errorEl.innerText = "Ошибка соединения с сервером. Попробуй еще раз.";
+                    const msg = (err.name === 'AbortError')
+                        ? "Время ожидания истекло. Сервер Render сейчас перезапускается, попробуй через минуту."
+                        : "Ошибка соединения с сервером. Попробуй еще раз.";
+                    errorEl.innerText = msg;
                     errorEl.classList.remove('hidden');
                 }
                 if (submitBtn) submitBtn.disabled = false;

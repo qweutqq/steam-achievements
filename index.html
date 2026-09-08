@@ -1331,9 +1331,28 @@
         }
 
         const isAuthSuccess = urlParams.get('auth_success') === '1';
+        const authError = urlParams.get('auth_error');
+
         if (isAuthSuccess) {
             const cleanUrl = window.location.pathname + (queryTgId ? `?tg_id=${queryTgId}` : '');
             window.history.replaceState({}, document.title, cleanUrl);
+        } else if (authError) {
+            const cleanUrl = window.location.pathname + (queryTgId ? `?tg_id=${queryTgId}` : '');
+            window.history.replaceState({}, document.title, cleanUrl);
+            setTimeout(() => {
+                openSteamModal();
+                const errorEl = document.getElementById('modal-error-message');
+                if (errorEl) {
+                    let msg = "Не удалось завершить вход через страницу Steam. Попробуй подключить аккаунт по коду друга ниже или повторить попытку.";
+                    if (authError === 'invalid_signature') {
+                        msg = "Недействительная подпись Steam. Попробуй снова или используй код друга ниже.";
+                    } else if (authError === 'cancelled') {
+                        msg = "Вход через Steam был отменен.";
+                    }
+                    errorEl.innerText = msg;
+                    errorEl.classList.remove('hidden');
+                }
+            }, 300);
         }
 
         checkUserStatus().then(() => {
